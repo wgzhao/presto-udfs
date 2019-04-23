@@ -111,39 +111,45 @@ public class ExtendedNumberFunctions
     @Description("convert Chinese number to Arabia number")
     @ScalarFunction("num2ch")
     @SqlType(StandardTypes.VARCHAR)
-    public static Slice  convertArabiaNumerToChineseNumber(@SqlType(StandardTypes.VARCHAR) Slice value)
+    public static Slice  convertArabiaNumerToChineseNumber(@SqlType(StandardTypes.VARCHAR) Slice value, @SqlType(StandardTypes.BOOLEAN) boolean flag)
     {
         long inputValue = Long.valueOf(value.toStringUtf8());
-        return convertArabiaNumerToChineseNumber(inputValue);
+        return convertArabiaNumerToChineseNumber(inputValue, flag);
     }
 
     @Description("convert Chinese number to Arabia number")
     @ScalarFunction("num2ch")
     @SqlType(StandardTypes.VARCHAR)
-    public static Slice  convertArabiaNumerToChineseNumber(@SqlType(StandardTypes.BIGINT) long value)
+    public static Slice  convertArabiaNumerToChineseNumber(@SqlType(StandardTypes.BIGINT) long value, @SqlType(StandardTypes.BOOLEAN)  boolean flag)
     {
+        int pos = flag ? 1 : 0;
         // private static final String[] units = { "", "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千", };
-        final String[] units = { "", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", };
+        final String[][] units = {
+            {"", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", },
+            {"", "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千", }};
         // final String[] nums = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九", };
-        final String[] nums = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+        final String[][] nums = {
+            { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", },
+            { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九", }};
         String result = ""; //转译结果
 
         for (int i = String.valueOf(value).length() - 1; i >= 0; i--) {
             //String.valueOf(value) 转换成String型得到其长度 并排除个位,因为个位不需要单位
             //value / Math.pow(10, i) 截位匹配单位
             int r = (int) (value / Math.pow(10, i));
-            result += nums[r % 10] + units[i];
+            result += nums[pos][r % 10] + units[pos][i];
         }
 
         // result = result.replaceAll("零[十, 百, 千]", "零");
         //匹配字符串中的 "零[十, 百, 千]" 替换为 "零"
         result = result.replaceAll("零[拾, 佰, 仟]", "零"); //匹配字符串中的 "零[十, 百, 千]" 替换为 "零"
+        result = result.replaceAll("零[十, 百, 千]", "零"); //匹配字符串中的 "零[十, 百, 千]" 替换为 "零"
         result = result.replaceAll("零+", "零"); //匹配字符串中的1或多个 "零" 替换为 "零"
         result = result.replaceAll("零([万, 亿])", "$1");
         result = result.replaceAll("亿万", "亿"); //亿万位拼接时发生的特殊情况
 
         // if (result.startsWith("一十")) { //判断是否以 "一十" 开头 如果是截取第一个字符
-        if (result.startsWith("壹拾")) { //判断是否以 "一十" 开头 如果是截取第一个字符
+        if (result.startsWith("壹拾")  || result.startsWith("一十")) { //判断是否以 "一十" 开头 如果是截取第一个字符
             result = result.substring(1);
         }
 

@@ -26,6 +26,10 @@ import io.airlift.slice.Slices;
 
 import static io.airlift.slice.SliceUtf8.countCodePoints;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 /**
  * Created by apoorvg on 28/06/16.
  */
@@ -147,5 +151,17 @@ public class ExtendedStringFunctions
         else {
             return Slices.EMPTY_SLICE;
         }
+    }
+
+    @Description("the implement of javascript eval function")
+    @ScalarFunction("eval")
+    @SqlType(StandardTypes.DOUBLE)
+    public static double eval(@SqlType(StandardTypes.VARCHAR) Slice estr) throws ScriptException
+    {
+        String evalstr = estr.toStringUtf8();
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("js");
+        Double result = Double.valueOf(engine.eval(evalstr).toString());
+        return result;
     }
 }

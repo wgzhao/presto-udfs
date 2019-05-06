@@ -8,12 +8,14 @@
 | ------------- |:-------------:|
 | _ver 0.208+_  | 当前版本    |
 
-
 ## 已经实现的 UDF
+
 该仓库实现了以下 Presto UDF 函数
 
-#### HIVE UDFs
+### HIVE UDFs
+
 * **日期-时间函数**
+  
  1. **to_utc_timestamp(timestamp, string timezone) -> timestamp** 
       把给定的带时区的时间戳转为标准时间。
       比如， to_utc_timestamp('1970-01-01 00:00:00','PST') 返回 1970-01-01 08:00:00.
@@ -34,37 +36,38 @@
  7. **hour(string date) -> int**
       从日期或者字符串中提取小时部分 
       比如，hour('2009-07-30 12:58:59') = 12, hour('12:58:59') = 12.
- 1. **minute(string date) -> int**
+ 8. **minute(string date) -> int**
       从日期或者字符串中提取分钟部分
       比如， minute('2009-07-30 12:58:59') = 58, minute('12:58:59') = 58.
- 2. **second(string date) -> int**
+ 9. **second(string date) -> int**
       从日期或者字符串中提取秒部分
       比如，second('2009-07-30 12:58:59') = 59, second('12:58:59') = 59.
- 3.  **to_date(string timestamp) -> string**
+ 10. **to_date(string timestamp) -> string**
       把时间戳转为日期字符串
       比如，to_date("2019-04-03 12:00:00") = "2019-04-03"
- 4.  **weekofyear(string date) -> int**
+ 11. **weekofyear(string date) -> int**
       返回时间戳字符串的周数
       比如，weekofyear('2019-04-23 09:37:23') = 17, weekofyear('2019-04-23') = 17.
- 5.  **date_sub(string startdate, int days) -> string**
+ 12. **date_sub(string startdate, int days) -> string**
       从给定的日期字符串中减去给定的天数
       比如，date_sub('2008-12-31', 1) = '2008-12-30'.
- 6.  **date_add(string startdate, int days) -> string**
+ 13. **date_add(string startdate, int days) -> string**
       从给定的日期字符串中增加给定的天数
       比如，date_add('2008-12-31', 1) = '2009-01-01'.
- 7.  **datediff(string enddate, string startdate) -> string**
+ 14. **datediff(string enddate, string startdate) -> string**
       计算两个日期的天数差
       比如，datediff('2009-03-01', '2009-02-27') = 2.
- 8.  **format_unixtimestamp(bigint unixtime[, string format]) -> string**
+ 15. **format_unixtimestamp(bigint unixtime[, string format]) -> string**
       把一个unix时间戳转为给定格式的日期字符串. 格式字符串遵循Java日期格式标准，详细情况请参考[这里](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
- 9.  **from_duration(string duration, string duration_unit) -> double**
-      把一个表示时间长度的字符串转为持续的时长数值。字符串表示法遵循 airlift 的 Duration format (https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/Duration.java) 
+ 16. **from_duration(string duration, string duration_unit) -> double**
+      把一个表示时间长度的字符串转为持续的时长数值。字符串表示法遵循 airlift 的 [Duration format](https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/Duration.java)
       比如，from_duration('4h', 'ms') = 1.44E7.
- 10. **from_datasize(string datasize, string size_unit) -> double**
+ 17. **from_datasize(string datasize, string size_unit) -> double**
        把给定的容量大小按照给定格式进行转换
        比如，from_datasize('1GB', 'B') = 1.073741824E9.
 
 * **数学函数**
+  
  1. **pmod(INT a, INT b) -> INT, pmod(DOUBLE a, DOUBLE b) -> DOUBLE**
       返回 a mod b 的值，商取正数
       比如， pmod(17, -5) = -3.
@@ -80,11 +83,12 @@
  5. **unhex(STRING a) -> BINARY**
       hex 的反向函数
       比如，unhex('7b') = 1111011.
- 6. **num2ch(STRING str, BOOLEAN flag) -> STRING , num2ch(long a, BOOLEAN flag) -> STRING** 
-      把数字转为汉字的数字，flag为true，把数字转为对应的汉字，否则转为汉字中的大写数字
-      比如，num2ch('103543', false) = '拾万叁仟伍佰肆拾叁', num2ch(103543, true) = '十万三千五百四十三'
+ 6. **num2ch(STRING str, [INT flag]) -> STRING , num2ch(long a, [ INT flag]) -> STRING** 
+      把数字转为汉字的数字，flag为0，把数字转为对应的汉字，flag为1，转为汉字中的大写数字。默认值为0
+      比如，num2ch('103543', 1) = '拾万叁仟伍佰肆拾叁', num2ch(103543) = '十万三千五百四十三'
 
 * **字符串函数**
+  
  1. **locate(string substr, string str[, int pos]) -> int** 
       返回从pos位置开始，第一次匹配到给定字符的位置
       比如，locate('si', 'mississipi', 2) = 4, locate('si', 'mississipi', 5) = 7
@@ -98,3 +102,6 @@
       返回中文标记的数字的阿拉伯数字形式
       比如，ch2num('十万三千五百四十三') = 103543, ch2num('壹拾万叁仟伍佰肆拾叁') = 103543
       _**注意**: 目前实现的限制，如果是十万XXX这种形式会报错，比如写成一十万_
+ 5. **eval(string str) -> double**
+      实现Javascript中eval函数的功能
+      比如, eval('4*(5+2)') = 28

@@ -1,116 +1,111 @@
-<!--
-{% comment %}
-  Copyright (c) 2019. FZZQ Inc
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+# 代码来源说明
 
-    http://www.apache.org/licenses/LICENSE-2.0
+该仓库原始代码来自 Qubole 的[Presto UDF Project](https://github.com/qubole/presto-udfs) 代码，不错很久没有更新，适配的 [Presto](https://prestodb.github.io) 版本也很低，所以 fork 过来进行了新版本适配，并适当增加了一部分函数
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License. See accompanying LICENSE file.
-{% endcomment %}
--->
 # Presto User-Defined Functions(UDFs)
-Plugin for Presto to allow addition of user defined functions. The plugin simplifies the process of adding user functions to Presto.
 
-## Plugging in Presto UDFs
-The details about how to plug in presto UDFs can be found [here](https://www.qubole.com/blog/product/plugging-in-presto-udfs/?nabe=5695374637924352:1).
+通过编写代码，可以为Presto 增加插件，从而实现更多的函数。
 
-## Presto Version Compatibility
+## Presto 版本兼容性
 
-| Presto Version| Last Compatible Release|
+| 版本  | 最新兼容发布版本 |
 | ------------- |:-------------:|
-| _ver 0.208+_     | current    |
+| _ver 0.208+_  | 当前版本    |
 
+## 已经实现的 UDF
 
-## Implemented User Defined Functions
-The repository contains the following UDFs implemented for Presto :
+该仓库实现了以下 Presto UDF 函数
 
-#### HIVE UDFs
-* **DATE-TIME Functions**
- 1. **to_utc_timestamp(timestamp, string timezone) -> timestamp** <br />
-      Assumes given timestamp is in given timezone and converts to UTC (as of Hive 0.8.0). For example, to_utc_timestamp('1970-01-01 00:00:00','PST') returns 1970-01-01 08:00:00.
- 2. **from_utc_timestamp(timestamp, string timezone) -> timestamp**<br />
-      Assumes given timestamp is UTC and converts to given timezone (as of Hive 0.8.0). For example, from_utc_timestamp('1970-01-01 08:00:00','PST') returns 1970-01-01 00:00:00.
- 3. **unix_timestamp() -> timestamp**<br />
-      Gets current Unix timestamp in seconds.
- 4. **year(string date) -> int**<br />
-      Returns the year part of a date or a timestamp string: year("1970-01-01 00:00:00") = 1970, year("1970-01-01") = 1970.
- 5. **month(string date) -> int**<br />
-      Returns the month part of a date or a timestamp string: month("1970-11-01 00:00:00") = 11, month("1970-11-01") = 11.
- 6. **day(string date) -> int**<br />
-      Returns the day part of a date or a timestamp string: day("1970-11-01 00:00:00") = 1, day("1970-11-01") = 1.
- 7. **hour(string date) -> int**<br />
-      Returns the hour of the timestamp: hour('2009-07-30 12:58:59') = 12, hour('12:58:59') = 12.
- 8. **minute(string date) -> int**<br />
-      Returns the minute of the timestamp: minute('2009-07-30 12:58:59') = 58, minute('12:58:59') = 58.
- 9. **second(string date) -> int**<br />
-      Returns the second of the timestamp: second('2009-07-30 12:58:59') = 59, second('12:58:59') = 59.
- 10. **to_date(string timestamp) -> string**<br />
-      Returns the date part of a timestamp string: to_date("1970-01-01 00:00:00") = "1970-01-01"
- 11. **weekofyear(string date) -> int**<br />
-      Returns the week number of a timestamp string: weekofyear("1970-11-01 00:00:00") = 44, weekofyear("1970-11-01") = 44.
- 12. **date_sub(string startdate, int days) -> string**<br />
-      Subtracts a number of days to startdate: date_sub('2008-12-31', 1) = '2008-12-30'.
- 13. **date_add(string startdate, int days) -> string**<br />
-      Adds a number of days to startdate: date_add('2008-12-31', 1) = '2009-01-01'.
- 14. **datediff(string enddate, string startdate) -> string**<br />
-      Returns the number of days from startdate to enddate: datediff('2009-03-01', '2009-02-27') = 2.
- 15. **format_unixtimestamp(bigint unixtime[, string format]) -> string**<br />
-      Converts the number of seconds from unix epoch (1970-01-01 00:00:00 UTC) to a string representing the timestamp of that moment in the current system time zone in the format of "1970-01-01 00:00:00" unless a format string is specified. If a format string is specified the epoch time is converted in the specified format. More information about the formatter can be found [here](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).<br />
-      _**NOTE :** Due to name collision of presto 0.142's implementaion of `from_unixtime(bigint unixtime)` function, which returns the value as a timestamp type and Hive's `from_unixtime(bigint unixtime[, string format])` function, which returns the value as string type and supports formatter, the hive UDF has been implemented as `format_unixtimestamp(bigint unixtime[, string format])`._
- 16. **from_duration(string duration, string duration_unit) -> double**<br />
-      Converts a string representing time duration in airlift's Duration format (https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/Duration.java) to a double representing time in specified unit: from_duration('4h', 'ms') = 1.44E7.
- 17. **from_datasize(string datasize, string size_unit) -> double**<br />
-       Converts a string representing data size in airlift's DataSize format (https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/DataSize.java) to a double representing size in specified unit: from_datasize('1GB', 'B') = 1.073741824E9.
+### HIVE UDFs
 
+* **日期-时间函数**
+  
+ 1. **to_utc_timestamp(timestamp, string timezone) -> timestamp** 
+      把给定的带时区的时间戳转为标准时间。
+      比如， to_utc_timestamp('1970-01-01 00:00:00','PST') 返回 1970-01-01 08:00:00.
+ 2. **from_utc_timestamp(timestamp, string timezone) -> timestamp**
+      把给定的标准时间转为给定时区的时间。 
+      比如, from_utc_timestamp('2019-04-23 09:37:23', 'Asia/Chongqing') 返回 2019-04-23 17:37:23.000
+ 3. **unix_timestamp() -> timestamp**
+      获得当前时间戳（单位为秒）
+ 4. **year(string date) -> int**
+      从日期或者时间戳字符串中提取年份
+      比如，year("2019-01-01 00:00:00") = 2019, year("2019-01-01") = 2019.
+ 5. **month(string date) -> int**
+      从日期或者字符串中提取月份
+      比如，month("2019-11-01 00:00:00") = 11, month("2019-11-01") = 11.
+ 6. **day(string date) -> int**
+      从日期或者字符串中提取天
+      比如，day("2019-11-01 00:00:00") = 1, day("2019-11-01") = 1.
+ 7. **hour(string date) -> int**
+      从日期或者字符串中提取小时部分 
+      比如，hour('2009-07-30 12:58:59') = 12, hour('12:58:59') = 12.
+ 8. **minute(string date) -> int**
+      从日期或者字符串中提取分钟部分
+      比如， minute('2009-07-30 12:58:59') = 58, minute('12:58:59') = 58.
+ 9. **second(string date) -> int**
+      从日期或者字符串中提取秒部分
+      比如，second('2009-07-30 12:58:59') = 59, second('12:58:59') = 59.
+ 10. **to_date(string timestamp) -> string**
+      把时间戳转为日期字符串
+      比如，to_date("2019-04-03 12:00:00") = "2019-04-03"
+ 11. **weekofyear(string date) -> int**
+      返回时间戳字符串的周数
+      比如，weekofyear('2019-04-23 09:37:23') = 17, weekofyear('2019-04-23') = 17.
+ 12. **date_sub(string startdate, int days) -> string**
+      从给定的日期字符串中减去给定的天数
+      比如，date_sub('2008-12-31', 1) = '2008-12-30'.
+ 13. **date_add(string startdate, int days) -> string**
+      从给定的日期字符串中增加给定的天数
+      比如，date_add('2008-12-31', 1) = '2009-01-01'.
+ 14. **datediff(string enddate, string startdate) -> string**
+      计算两个日期的天数差
+      比如，datediff('2009-03-01', '2009-02-27') = 2.
+ 15. **format_unixtimestamp(bigint unixtime[, string format]) -> string**
+      把一个unix时间戳转为给定格式的日期字符串. 格式字符串遵循Java日期格式标准，详细情况请参考[这里](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
+ 16. **from_duration(string duration, string duration_unit) -> double**
+      把一个表示时间长度的字符串转为持续的时长数值。字符串表示法遵循 airlift 的 [Duration format](https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/Duration.java)
+      比如，from_duration('4h', 'ms') = 1.44E7.
+ 17. **from_datasize(string datasize, string size_unit) -> double**
+       把给定的容量大小按照给定格式进行转换
+       比如，from_datasize('1GB', 'B') = 1.073741824E9.
 
-* **MATH Functions**
- 1. **pmod(INT a, INT b) -> INT, pmod(DOUBLE a, DOUBLE b) -> DOUBLE**<br />
-      Returns the positive value of a mod b: pmod(17, -5) = -3.
- 2. **rands(INT seed) -> DOUBLE**<br />
-      Returns a random number (that changes from row to row) that is distributed uniformly from 0 to 1. Specifying the seed will make sure the generated random number sequence is deterministic: rands(3) = 0.731057369148862 <br />
-      _**NOTE :** Due to name collision of presto 0.142's implementaion of `rand(int a)` function, which returns a number between 0 to a and Hive's `rand(int seed)` function, which sets the seed for the random number generator, the hive UDF has been implemented as `rands(int seed)`._
- 3. **bin(BIGINT a) -> STRING**<br />
-      Returns the number in binary format: bin(100) = 1100100.
- 4. **hex(BIGINT a) -> STRING, hex(STRING a) -> STRING, hex(BINARY a) -> STRING**<br />
-      If the argument is an INT or binary, hex returns the number as a STRING in hexadecimal format. Otherwise if the number is a STRING, it converts each character into its hexadecimal representation and returns the resulting STRING:  hex(123) = 7b, hex('123') = 7b, hex('1100100') = 64.
- 5. **unhex(STRING a) -> BINARY**<br />
-      Inverse of hex. Interprets each pair of characters as a hexadecimal number and converts to the byte representation of the number: unhex('7b') = 1111011.
+* **数学函数**
+  
+ 1. **pmod(INT a, INT b) -> INT, pmod(DOUBLE a, DOUBLE b) -> DOUBLE**
+      返回 a mod b 的值，商取正数
+      比如， pmod(17, -5) = -3.
+ 2. **rands(INT seed) -> DOUBLE**
+      返回0-1之间的随机数，注意，该值用在查询中，是每一行的值都会改变。参数为指定随机种子
+      比如， rands(3) = 0.731057369148862 
+ 3. **bin(BIGINT a) -> STRING**
+      返回给定整数的二进制值
+      比如，bin(100) = 1100100.
+ 4. **hex(BIGINT a) -> STRING, hex(STRING a) -> STRING, hex(BINARY a) -> STRING**
+      如果给定的参数是一个正数或者一个二进制数，则将其转为十六进制数的字符串形式，如果给定的是一个字符串，则把每个字符先转为对应的十六进制，然后返回结果
+      比如，hex(123) = 7b, hex('123') = 7b, hex('1100100') = 64.
+ 5. **unhex(STRING a) -> BINARY**
+      hex 的反向函数
+      比如，unhex('7b') = 1111011.
+ 6. **num2ch(STRING str, [INT flag]) -> STRING , num2ch(long a, [ INT flag]) -> STRING** 
+      把数字转为汉字的数字，flag为0，把数字转为对应的汉字，flag为1，转为汉字中的大写数字。默认值为0
+      比如，num2ch('103543', 1) = '拾万叁仟伍佰肆拾叁', num2ch(103543) = '十万三千五百四十三'
 
-* **STRING Functions**
- 1. **locate(string substr, string str[, int pos]) -> int** <br />
-      Returns the position of the first occurrence of substr in str after position pos: locate('si', 'mississipi', 2) = 4, locate('si', 'mississipi', 5) = 7
- 2. **find_in_set(string str, string strList) -> int** <br />
-      Returns the first occurance of str in strList where strList is a comma-delimited string. Returns null if either argument is null. Returns 0 if the first argument contains any commas:  find_in_set('ab', 'abc,b,ab,c,def') returns 3.
- 3. **instr(string str, string substr) -> int** <br />
-      Returns the position of the first occurrence of substr in str. Returns null if either of the arguments are null and returns 0 if substr could not be found in str: instr('mississipi' , 'si') = 4.
-
-* **CONDITIONAL Functions**
-  1. **nvl(T value, T default_value) -> T**<br/>
-      ** Supported only till v1.0.0 due to the limitations presto new versions of Presto puts on plugins
-      Returns default value if value is null else returns value: nvl(3,4) = 3, nvl(NULL,4) = 4.
-
-* **MISCELLANEOUS Functions**
-  1. **hash(a1[, a2...]) -> int**<br/>
-      ** Supported only till v1.0.0 due to the limitations presto new versions of Presto puts on plugins
-      Returns a hash value of the arguments. hash('a','b','c') = 143025634.
-
-## Adding User Defined Functions to Presto-UDFs
- Functions can be added using annotations, follow https://prestodb.io/docs/current/develop/functions.html for details on how to add functions
-
-  ** Note that Code generated functions were supported only till v1.0.0 due to the limitations presto new versions of Presto puts on plugins
-
-## Release a new version of presto-udfs
-Releases are always created from `master`. During development, `master`
-has a version like `X.Y.Z-SNAPSHOT`.
-
-    # Change version as per http://semver.org/
-    mvn release:prepare -Prelease
-    mvn release:perform -Prelease
-    git push
-    git push --tags
+* **字符串函数**
+  
+ 1. **locate(string substr, string str[, int pos]) -> int** 
+      返回从pos位置开始，第一次匹配到给定字符的位置
+      比如，locate('si', 'mississipi', 2) = 4, locate('si', 'mississipi', 5) = 7
+ 2. **find_in_set(string str, string strList) -> int** 
+      从用逗号分割的字符串组中找到第一个匹配的字符的位置，任意参数为null，则返回为null；如果第一个参数包含任意多个都好，则返回为0.
+      比如，find_in_set('ab', 'abc,b,ab,c,def') = 3.
+ 3. **instr(string str, string substr) -> int** 
+      返回一个字串在字符串中首次出现的位置，任意参数为null时，返回null，如果没有找到，则返回为0，注意，开始字符标记为1而不是0
+      比如，instr('mississipi' , 'si') = 4.
+ 4. **ch2num(string str) -> long, ch2num(long a) -> long**
+      返回中文标记的数字的阿拉伯数字形式
+      比如，ch2num('十万三千五百四十三') = 103543, ch2num('壹拾万叁仟伍佰肆拾叁') = 103543
+      _**注意**: 目前实现的限制，如果是十万XXX这种形式会报错，比如写成一十万_
+ 5. **eval(string str) -> double**
+      实现Javascript中eval函数的功能， 暂时仅支持 +，-，*， / 运算
+      比如, eval('4*(5+2)') = 28

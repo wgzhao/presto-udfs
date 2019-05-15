@@ -1,6 +1,6 @@
 # 代码来源说明
 
-该仓库原始代码来自 Qubole 的[Presto UDF Project](https://github.com/qubole/presto-udfs) 代码，不错很久没有更新，适配的 [Presto](https://prestodb.github.io) 版本也很低，所以 fork 过来进行了新版本适配，并适当增加了一部分函数
+该仓库原始代码来自 Qubole 的[Presto UDF Project](https://github.com/qubole/presto-udfs) 代码，不过很久没有更新了，其适配的 [Presto](https://prestodb.github.io) 版本也很低，所以 fork 过来主要是适配工作环境中的版本，并以工作需要适当增加了一些函数
 
 # Presto User-Defined Functions(UDFs)
 

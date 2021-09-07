@@ -33,96 +33,266 @@
 
 该仓库实现了以下 Presto UDF 函数
 
-### HIVE UDFs
+### 日期-时间函数
 
-* **日期-时间函数**
-  
- 1. **to_utc_timestamp(timestamp, string timezone) -> timestamp**   
-      把给定的带时区的时间戳转为标准时间。  
-      比如， `to_utc_timestamp('1970-01-01 00:00:00','PST') 返回 1970-01-01 08:00:00`.
- 2. **from_utc_timestamp(timestamp, string timezone) -> timestamp**  
-      把给定的标准时间转为给定时区的时间。   
-      比如, `from_utc_timestamp('2019-04-23 09:37:23', 'Asia/Chongqing') 返回 2019-04-23 17:37:23.000`
- 3. **unix_timestamp() -> timestamp**  
-      获得当前时间戳（单位为秒）
- 4. **year(string date) -> int**    
-      从日期或者时间戳字符串中提取年份  
-      比如，`year("2019-01-01 00:00:00") = 2019, year("2019-01-01") = 2019`.
- 5. **month(string date) -> int**  
-      从日期或者字符串中提取月份  
-      比如，`month("2019-11-01 00:00:00") = 11, month("2019-11-01") = 11`.
- 6. **day(string date) -> int**  
-      从日期或者字符串中提取天  
-      比如，`day("2019-11-01 00:00:00") = 1, day("2019-11-01") = 1`.
- 7. **hour(string date) -> int**  
-      从日期或者字符串中提取小时部分   
-      比如，`hour('2009-07-30 12:58:59') = 12, hour('12:58:59') = 12`.
- 8. **minute(string date) -> int**  
-      从日期或者字符串中提取分钟部分  
-      比如， `minute('2009-07-30 12:58:59') = 58, minute('12:58:59') = 58`.
- 9. **second(string date) -> int**  
-      从日期或者字符串中提取秒部分  
-      比如，`second('2009-07-30 12:58:59') = 59, second('12:58:59') = 59`.
- 10. **to_date(string timestamp) -> string**  
-      把时间戳转为日期字符串  
-      比如，`to_date("2019-04-03 12:00:00") = "2019-04-03"`
- 11. **weekofyear(string date) -> int**  
-      返回时间戳字符串的周数  
-      比如，`weekofyear('2019-04-23 09:37:23') = 17, weekofyear('2019-04-23') = 17`.
- 12. **date_sub(string startdate, int days) -> string**  
-      从给定的日期字符串中减去给定的天数  
-      比如，`date_sub('2008-12-31', 1) = '2008-12-30'`.
- 13. **date_add(string startdate, int days) -> string**  
-      从给定的日期字符串中增加给定的天数  
-      比如，`date_add('2008-12-31', 1) = '2009-01-01'`.
- 14. **datediff(string enddate, string startdate) -> string**  
-      计算两个日期的天数差  
-      比如，`datediff('2009-03-01', '2009-02-27') = 2`.
- 15. **format_unixtimestamp(bigint unixtime[, string format]) -> string**  
-      把一个unix时间戳转为给定格式的日期字符串. 格式字符串遵循Java日期格式标准，详细情况请参考[这里](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
- 16. **from_duration(string duration, string duration_unit) -> double**  
-      把一个表示时间长度的字符串转为持续的时长数值。字符串表示法遵循 airlift 的 [Duration format](https://github.com/airlift/units/blob/master/src/main/java/io/airlift/units/Duration.java)  
-      比如，`from_duration('4h', 'ms') = 1.44E7`.
- 17. **from_datasize(string datasize, string size_unit) -> double**  
-       把给定的容量大小按照给定格式进行转换  
-       比如，`from_datasize('1GB', 'B') = 1.073741824E9`.
+#### to_utc_timestamp(timestamp, string timezone) -> timestamp
 
-* **数学函数**
-  
- 1. **pmod(INT a, INT b) -> INT, pmod(DOUBLE a, DOUBLE b) -> DOUBLE**  
-      返回 a mod b 的值，商取正数  
-      比如， `pmod(17, -5) = -3`.
- 2. **rands(INT seed) -> DOUBLE**
-      返回0-1之间的随机数，注意，该值用在查询中，是每一行的值都会改变。参数为指定随机种子  
-      比如， `rands(3) = 0.731057369148862` 
- 3. **bin(BIGINT a) -> STRING**  
-      返回给定整数的二进制值  
-      比如，`bin(100) = 1100100`.
- 4. **hex(BIGINT a) -> STRING, hex(STRING a) -> STRING, hex(BINARY a) -> STRING**  
-      如果给定的参数是一个正数或者一个二进制数，则将其转为十六进制数的字符串形式，如果给定的是一个字符串，则把每个字符先转为对应的十六进制，然后返回结果  
-      比如，h`ex(123) = 7b, hex('123') = 7b, hex('1100100') = 64`.
- 5. **unhex(STRING a) -> BINARY**  
-      hex 的反向函数  
-      比如，`unhex('7b') = 1111011`.
- 6. **num2ch(STRING str, [INT flag]) -> STRING , num2ch(long a, [ INT flag]) -> STRING**   
-      把数字转为汉字的数字，flag为0，把数字转为对应的汉字，flag为1，转为汉字中的大写数字。默认值为0  
-      比如，`num2ch('103543', 1) = '拾万叁仟伍佰肆拾叁', num2ch(103543) = '十万三千五百四十三'`
+把给定的带时区的时间戳转为标准时间。  
 
-* **字符串函数**
-  
- 1. **locate(string substr, string str[, int pos]) -> int**   
-      返回从pos位置开始，第一次匹配到给定字符的位置  
-      比如，`locate('si', 'mississipi', 2) = 4, locate('si', 'mississipi', 5) = 7`
- 2. **find_in_set(string str, string strList) -> int**   
-      从用逗号分割的字符串组中找到第一个匹配的字符的位置，任意参数为null，则返回为null；如果第一个参数包含任意多个都好，则返回为0.  
-      比如，`find_in_set('ab', 'abc,b,ab,c,def') = 3`.
- 3. **instr(string str, string substr) -> int**   
-      返回一个字串在字符串中首次出现的位置，任意参数为null时，返回null，如果没有找到，则返回为0，注意，开始字符标记为1而不是0  
-      比如，`instr('mississipi' , 'si') = 4`.
- 4. **ch2num(string str) -> long, ch2num(long a) -> long**  
-      返回中文标记的数字的阿拉伯数字形式  
-      比如，`ch2num('十万三千五百四十三') = 103543, ch2num('壹拾万叁仟伍佰肆拾叁') = 103543 `   
-      _**注意**: 目前实现的限制，如果是十万XXX这种形式会报错，比如写成一十万_
- 5. **eval(string str) -> double**  
-      实现Javascript中eval函数的功能， 暂时仅支持 +，-，\*， / 运算  
-      比如, `eval('4*(5+2)') = 28`
+```sql
+select to_utc_timestamp('1970-01-01 00:00:00','PST') -- 1970-01-01 08:00:00`
+```
+
+#### from_utc_timestamp(timestamp, string timezone) -> timestamp
+
+把给定的标准时间转为给定时区的时间。 
+
+```sql
+select from_utc_timestamp('2019-04-23 09:37:23', 'Asia/Chongqing')  -- 2019-04-23 17:37:23.000
+```
+
+### 数学函数
+
+ #### pmod(n, m) -> [same as input]
+
+返回 n mod m 的值，商取正数 
+
+```sql
+select pmod(17, -5) -- -3
+```
+
+#### num2ch(string str, [int flag]) -> string , num2ch(long a, [ int flag]) -> string
+
+把数字转为汉字的数字，flag为0，把数字转为对应的汉字，flag为1，转为汉字中的大写数字。默认值为0 
+
+```sql
+select num2ch('103543', 1) -- 拾万叁仟伍佰肆拾叁
+select num2ch(103543) -- 十万三千五百四十三
+```
+
+### 字符串函数
+
+#### ch2num(string str) -> long, ch2num(long a) -> long
+
+返回中文标记的数字的阿拉伯数字形式 
+
+```sql
+select ch2num('十万三千五百四十三'); -- 103543
+select ch2num('壹拾万叁仟伍佰肆拾叁'); -- 103543   
+```
+ **注意**: 目前实现的限制，如果是十万XXX这种形式会报错，比如写成一十万
+
+#### eval(string str) -> double
+实现Javascript中eval函数的功能， 暂时仅支持 `+`，`-`，`*`， `/` 运算
+
+```sql
+select eval('4*(5+2)'); -- 28
+```
+
+#### is_idcard(string id) -> bool
+
+检测给定的身份证号码是否有效， 支持中国大陆身份证（15位和18位）以及港澳台的10位证件号码
+
+```sql
+select is_idcard() -- false
+select is_idcard('23070719391110007X') -- true
+select is_idcard('230707391110007') -- true
+select is_idcard('1234566') -- false
+```
+
+#### get_birthday(string id) -> int
+
+从有效的身份证号码中提取生日，如果身份证无效，则返回为0
+
+```sql
+select get_birthday() -- 0
+select get_birthday('23070719391110007X') -- 19391110
+select get_birthday('230707391110007') -- 19391110
+select get_birthday('1234566') -- 0
+```
+
+### IP 相关函数
+
+#### ip_to_int(string ip) -> int
+
+将有效的IP地址转为长整数表达法，如果指定的IP地址无效，则返回为0
+
+```sql
+select ip_to_int('127.0.0.1'); -- 2130706433
+select ip_to_int('0.0.0.0'); -- 0
+select ip_to_int('a.b.c.d'); -- 0
+```
+
+#### int_to_ip(int a) -> string
+
+将长整数表示的IP地址转为十进制字符出表达法，如果`a` 小于0 ，则返回为 NULL
+
+```sql
+select int_to_ip(185999660); -- 11.22.33.44
+select int_to_ip(0); -- 0.0.0.0
+select int_to_ip(-1); -- NULL
+```
+
+#### ip2region(string ip, [string flag]) -> string
+
+`ip2region` 实现了IP地址归属地以及国家对应的国际编码查询，国际编码定义来源于 [ISO 3166-1](https://zh.wikipedia.org/wiki/ISO_3166-1)。
+该函数带一个必选参数和一个可选参数，语义如下：
+
+```sql
+ip2region(ip, [country|g|province|p|city|c|isp|i|en|m2|m3|digit])
+```
+
+必选参数 `ip` 表示要查询的 IP 地址，目前仅支持点分字符串IP地址格式，比如 
+
+```sql
+presto> select ip2region('119.29.29.29'); -- 中国|0|北京|北京市|腾讯
+```
+
+上述查询结果的层级用 `|` 分隔，从第一列开始，分别表示 `国家|区域|省份|城市|供应商(ISP)`
+
+如果对应的列没有值，则用 `0` 表示（注意：不是用`null`表示)
+
+比如下面的查询:
+
+```sql
+select ip2region('1.1.1.1'); -- 澳大利亚|0|0|0|0
+```
+
+则表示只有国家信息，其他信息缺失
+
+如果IP地址非法，则返回`null`，比如
+
+```sql
+select ip2region('a.b.c.d');  -- NULL
+select ip2region('1.1.1.'); 	-- NULL
+```
+
+这里的IP地址也可以网络地址，比如
+
+```sql
+select ip2region('119.29.29.0'); -- 中国|0|北京|北京市|腾讯
+select ip2region('119.29.0.0');  -- 中国|0|广东省|广州市|电信
+```
+
+第二个参数为可选参数，用来指定想要获取哪个层级的信息，每个定义有完整单词以及缩写，含义如下：
+
+- `country|g` 表示查询IP地址所在国家
+- `province|p` 表示查询IP地址所在省份/州/道
+- `city|c` 表示查询IP地址所在城市
+- `isp|i` 表示查询
+- `en` 返回IP地址表示国家英语名称，比如 `China`
+- `m2` 返回IP地址表示国家两位自字母代码，比如 `CN`
+- `m3` 返回IP地址表示国家三位自字母代码，比如 `CHN`
+- `digit` 返回IP地址表示国家数字代码，比如 `156`
+
+以下是一些查询例子
+
+```sql
+select ip2region('119.29.29.29','c'); -- 北京市
+select ip2region('8.8.8.8','g'); 			-- 美国
+select ip2region('223.5.5.5','i'); 		-- 阿里云
+select ip2region('1.1.1.1','en') 			-- Australia
+select ip2region('1.1.1.1','m2'); 		-- AU
+select ip2region('1.1.1.1','m3'); 		-- AUS
+select ip2region('1.1.1.1','digit'); 	-- 36
+```
+
+### mobile2region
+
+`mobile2region` 实现了手机号码归属地查询，该函数接受一个必选参数和一个可选参数，语义如下：
+
+```sql
+mobile2region(tel, [province|p|city|c|isp|i])
+```
+
+第一个参数 `tel` 表示要查询的手机号码，第二个参数表示要返回的层级，含义如下：
+
+- `province|p` 表示查询IP地址所在省份/州/道
+- `city|c` 表示查询IP地址所在城市
+- `isp|i` 表示查询
+
+以下是一些查询例子
+
+```sql
+select mobile2region('13410774560'); 		-- 广东|深圳|中国移动
+select mobile2region('13011'); 					-- NULL
+select mobile2region('18945871234','p'); -- 黑龙江
+select mobile2region('18945871234','c'); -- 伊春
+select mobile2region('18945871234','i'); -- 中国电信
+```
+
+###  证券交易日相关函数
+
+这里的函数都和中国大陆证券交易日相关的函数，国内证券交易日符合以下条件
+
+1. 双休日和国家法定节假日必然不是交易日
+2. 调休中遇到双休日（比如周六要求上班）也不是双休日
+
+由于每年的调休不同，也就导致证券交易日没有固定的规律，需要有交易所在头一年年底下发到各券商，同时遇到一些特别情况，还有临时调整（比如2020年1月31日周五，农历初七，本应为交易日，但受疫情影响，调整为非交易日）。因此交易日之间的计算是证券相关数据分析必然会遇到的问题。下面的函数试图简化交易日期计算难度。
+
+
+
+#### udf_add_normal_days(string basedate, int n) -> string
+
+计算在给定日期后的 n 天内的第一个交易日, 如果 n 是正数，则往后计算；如果是负数，则往前计算。
+
+该函数的计算分成两步：
+
+1. 在指定的日期 `basedate`上增加 `n` 天，得到一个日期 `delta_date`；
+
+第二步是找到不超过 `delta_date` 日期的最近交易日。
+
+```sql
+select udf_add_normal_days('20210903', 4); -- 20210907
+select udf_add_normal_days('20210904', 1); -- 20210903
+select udf_add_normal_days('20210906', -1) -- 20210903
+```
+
+#### udf_count_trade_days(string d1, string d2) -> int
+
+计算两个给定的第一个日期（包括）和第二个日期（包括）之间有多少个交易日，日期格式为 `yyyyMMdd`
+
+```sql
+select udf_count_trade_days('20210901', '20210906'); -- 4
+select udf_count_trade_days('20210906', '20210906'); -- 1
+select udf_count_trade_days('20210903', '20210906'); -- 2
+
+```
+
+#### udf_add_trade_days(string basedate, int n) -> string
+
+计算在超过指定日期(`basedate`)的最近交易日上增加 n 个交易日后的日期并返回。这个计算实际上两个步骤
+
+1. 找到不超过 `basedate` 日期最近的交易日（`basedate` 如果本身是交易日，则为自身），然后
+2. 增加 n 个交易日（注意：不是自然日），等于找到指定日期的后几个交易日期
+
+```sql
+select udf_add_trade_days('20210903', 1); -- 20210906
+select udf_add_trade_days('20210904', 1); -- 20210906
+select udf_add_trade_days('20210101', 3); -- 20210104
+```
+
+注意该函数于 `udf_add_normal_days` 的逻辑区别。
+
+#### udf_last_trade_trade(string d) -> string
+
+获取指定日期(`d`)的上一 日 交易日并返回，如果没有找到，则返回 NULL.
+
+```sql
+select udf_last_trade_date('20210906'); -- 20210903
+select udf_last_trade_date('20210907'); -- 20210906
+select udf_last_trade_date('19920101'); -- NULL
+```
+
+#### udf_is_trade_date(string d) -> bool
+
+判断给定的日期是否为交易日，如果是，返回 true，其他情况返回 false
+
+```sql
+select udf_is_trade_date(); -- false
+select udf_is_trade_date(''); -- false
+select udf_is_trade_date('20210906'); -- true
+select udf_is_trade_date('20210904'); -- false
+select udf_is_trade_date('20211009'); -- false
+```
+

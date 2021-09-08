@@ -5,7 +5,7 @@
 
     <groupId>com.wgzhao.presto</groupId>
     <artifactId>udfs</artifactId>
-    <version>2.0.8-SNAPSHOT</version>
+    <version>2.0.8</version>
     <name>PrestoUDFs</name>
     <url>https://github.com/wgzhao/presto-udfs</url>
     <description>Common Functions for the PrestoSQL/TrinoDB Engine</description>
@@ -31,7 +31,7 @@
         <url>https://github.com/wgzhao/presto-udfs</url>
         <connection>scm:git:git://github.com/wgzhao/presto-udfs.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/presto-udfs.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>2.0.8</tag>
     </scm>
 
     <licenses>

@@ -1,43 +1,83 @@
-# 代码来源说明
-
-该仓库原始代码来自 Qubole 的[Presto UDF Project](https://github.com/qubole/presto-udfs) 代码，不过很久没有更新了，其适配的 [Presto](https://prestodb.github.io) 版本也很低，所以 fork 过来主要是适配工作环境中的版本，并以工作需要适当增加了一些函数
-
 # Presto User-Defined Functions(UDFs)
 
-通过编写代码，可以为Presto 增加插件，从而实现更多的函数。
+Presto/Trino 自定义函数，当前仅针对 [Trino/PrestoSQL](https://trino.io) 版本有有效， facebook版的 [prestodb](https://prestodb.io) 暂不支持。
 
-## Presto 版本兼容性
+## Trino/Presto 版本兼容性
 
-| 版本  | 最新兼容发布版本 |
+PrestoSQL 的版本终止在 `348` 版本，之后的版本取名为 `trino` ，两者不在兼容。 如果你在使用 `348`及之前的版本，请使用 `2.0.8` 版本，否则选择大于 `2.0.8` 版本的代码
+
+| Presto/Trino 版本  | UDF 版本 |
 | ------------- |:-------------:|
-| _ver 0.208+_  | 当前版本    |
+| <= 348 |   2.0.8  |
+| > 348  | > 2.0.8 | 
 
 ## 使用方法
 
-### 下载代码
+### 直接下载
 
-`git clone https://github.com/wgzhao/presto-udfs`
+如果不想编译，可以从 `release` 页面中找到对应的版本的压缩文件下载到本地。或者你也可以按照以下方式进行编译
 
-### 编译
+### 自行编译
 
-`mvn clean package`
+下载代码并编译打包
+
+```shell
+git clone https://github.com/wgzhao/presto-udfs
+mvn clean package assembly:single
+```
+
+执行上述指令后，将在 `target` 目录下，生成一个 `udfs-<version>-release.zip` 的压缩包
 
 ### 安装
 
-假定你的 Presto 安装  _/usr/lib/presto_ 目下， 首先在 _/usr/lib/presto/plugin_ 目录下创建一个文件夹，比如 _/usr/lib/presto/plugin/udfs\_example_ ,
-然后把编译出来的 _target/udfs-2.0.4-SNAPSHOT.jar_ 文件拷贝到上述新建目录中。
+假定你的 Presto 安装  `/usr/lib/presto` 目下，执行下面的命令进行安装
 
-重启 Presto 服务，连接 Presto 服务后，执行 `show functions` 查看是否有新增的函数，如果没有，可以查看对应的日志查看错误原因。
+```shell
+unzip -q -o udfs-<version>-release.zip -d /usr/lib/presto/plugin/
+```
+
+如果安装的是 Trino， 假定安装目录为  `/usr/lib/trino`， 则执行下面的命令：
+
+```shell
+unzip -q -o udfs-<version>-release.zip -d /usr/lib/trino/plugin/
+```
+
+上面命令完成后，将会在安装目录的 `plugin/` 目录下创建一个 `extra` 目录，所有需要的jar文件均在该目录。
+
+重启 Presto/Trino 服务，连接 Presto/Trino 服务后，执行 `show functions like 'udf_%'` 将得到类似如下的输出
+
+|       Function       | Return Type |  Argument Types  | Function Type | Deterministic |                      Description  |
+----------------------|--------------|------------------|---------------|---------------|-----------------------------------------------------|
+| udf_add_normal_days  | varchar     | varchar, integer | scalar        | true          | add days from base date |
+| udf_add_trade_days   | varchar     | varchar, integer | scalar        | true          | add days from base date with yyyyMMdd format |
+| udf_ch2num           | bigint      | varchar          | scalar        | true          | convert chinese number to Arabia number |
+| udf_count_trade_days | integer     | varchar, varchar | scalar        | true          | count the number of trade date between given two dates |
+| udf_eval             | double      | varchar          | scalar        | true          | the implement of javascript eval function |
+| udf_get_birthday     | integer     | varchar          | scalar        | true          | Extract birthday from valid ID card |
+| udf_int2ip           | varchar     | integer          | scalar        | true          | get region from IP Address |
+| udf_ip2int           | bigint      | varchar          | scalar        | true          | get region from IP Address |
+| udf_ip2region        | varchar     | varchar          | scalar        | true          | get region from IP Address |
+| udf_ip2region        | varchar     | varchar, varchar | scalar        | true          | get region from IP Address |
+| udf_is_idcard        | boolean     | varchar          | scalar        | true          | Check IdCard is valid or not |
+| udf_is_trade_date    | boolean     | varchar          | scalar        | true          | is close day or not |
+| udf_last_trade_date  | varchar     | varchar          | scalar        | true          | get the last exchange day before specified date |
+| udf_max_draw_down    | double      | varchar          | scalar        | true          | get the max drawdown rate |
+| udf_num2ch           | varchar     | bigint           | scalar        | true          | convert Chinese number to Arabia number |
+| udf_num2ch           | varchar     | bigint, boolean  | scalar        | true          | convert Chinese number to Arabia number |
+| udf_num2ch           | varchar     | varchar          | scalar        | true          | convert Chinese number to Arabia number |
+| udf_num2ch           | varchar     | varchar, boolean | scalar        | true          | convert Chinese number to Arabia number |
+| udf_pmod             | bigint      | bigint, bigint   | scalar        | true          | Returns the positive value of a mod b. |
+| udf_pmod             | double      | double, double   | scalar        | true          | Returns the positive value of a mod b |
+| udf_to_chinese       | varchar     | varchar          | scalar        | true          | convert number string to chinese number string |
+| udf_to_chinese       | varchar     | varchar, boolean | scalar        | true          | convert number string to chinese number string |
 
 ## 已经实现的 UDF
-
-该仓库实现了以下 Presto UDF 函数
 
 ### 数学函数
 
 #### udf_pmod(n, m) -> [same as input]
 
-返回 n mod m 的值，商取正数 
+返回 n mod m 的值，商取正数
 
 ```sql
 select udf_pmod(17, -5) -- -3
@@ -61,7 +101,6 @@ select udf_num2ch(); -- NULL
 
 返回中文标记的数字的阿拉伯数字形式 ，如果传递字符串为空或包含非汉字数字，则返回为 NULL。
 
-
 ```sql
 select udf_ch2num('一十万三千五百四十三'); -- 103543
 select udf_ch2num('壹拾万叁仟伍佰肆拾叁'); -- 103543   
@@ -70,14 +109,14 @@ select udf_ch2num(null); -- NULL
 select udf_ch2num('abc'); -- NULL
 ```
 
-**注意**: 
+**注意**:
+
 1. 目前实现的限制，如果是十万XXX这种形式会报错，必须写成一十万
 2. 但如果一个不合法的汉字数字，目前无法正确识别, 比如 `select udf_ch2num('拾万万'); -- 10` 得到的是一个不正确的结果
 
 #### udf_to_chinese(string str, [boolean flag] ) -> string
 
-把数字字符串转为汉字字符串，注意它和 `udf_num2ch` 函数区别是本函数不含数量关系，即仅仅把每个阿拉伯数字转为中文汉字。
-同样的，使用 `flag` 来区分是普通大写，还是汉字大写。true` 表示普通写法，`false` 表示大写写法，默认值为 `false`
+把数字字符串转为汉字字符串，注意它和 `udf_num2ch` 函数区别是本函数不含数量关系，即仅仅把每个阿拉伯数字转为中文汉字。 同样的，使用 `flag` 来区分是普通大写，还是汉字大写。true` 表示普通写法，`false` 表示大写写法，默认值为 `false`
 
 ```sql
 select udf_to_chinese('2002'); -- 贰零零贰
@@ -86,6 +125,7 @@ select udf_to_chinese('2002', true); -- 二〇〇二
 ```
 
 #### eval(string str) -> double
+
 实现Javascript中eval函数的功能， 暂时仅支持 `+`，`-`，`*`， `/` 运算
 
 ```sql
@@ -147,7 +187,7 @@ select udf_int2ip(-1); -- NULL
 udf_ip2region(ip, [country|g|province|p|city|c|isp|i|en|m2|m3|digit])
 ```
 
-必选参数 `ip` 表示要查询的 IP 地址，目前仅支持点分字符串IP地址格式，比如 
+必选参数 `ip` 表示要查询的 IP 地址，目前仅支持点分字符串IP地址格式，比如
 
 ```sql
 select udf_ip2region('119.29.29.29'); -- 中国|0|北京|北京市|腾讯
@@ -168,15 +208,15 @@ select udf_ip2region('1.1.1.1'); -- 澳大利亚|0|0|0|0
 如果IP地址非法，则返回`null`，比如
 
 ```sql
-select udf_ip2region('a.b.c.d');  -- NULL
-select udf_ip2region('1.1.1.'); 	-- NULL
+select udf_ip2region('a.b.c.d'); -- NULL
+select udf_ip2region('1.1.1.'); -- NULL
 ```
 
 这里的IP地址也可以网络地址，比如
 
 ```sql
 select udf_ip2region('119.29.29.0'); -- 中国|0|北京|北京市|腾讯
-select udf_ip2region('119.29.0.0');  -- 中国|0|广东省|广州市|电信
+select udf_ip2region('119.29.0.0'); -- 中国|0|广东省|广州市|电信
 ```
 
 第二个参数为可选参数，用来指定想要获取哪个层级的信息，每个定义有完整单词以及缩写，含义如下：
@@ -193,13 +233,13 @@ select udf_ip2region('119.29.0.0');  -- 中国|0|广东省|广州市|电信
 以下是一些查询例子
 
 ```sql
-select udf_ip2region('119.29.29.29','c'); -- 北京市
-select udf_ip2region('8.8.8.8','g'); 			-- 美国
-select udf_ip2region('223.5.5.5','i'); 		-- 阿里云
-select udf_ip2region('1.1.1.1','en') 			-- Australia
-select udf_ip2region('1.1.1.1','m2'); 		-- AU
-select udf_ip2region('1.1.1.1','m3'); 		-- AUS
-select udf_ip2region('1.1.1.1','digit'); 	-- 36
+select udf_ip2region('119.29.29.29', 'c'); -- 北京市
+select udf_ip2region('8.8.8.8', 'g'); -- 美国
+select udf_ip2region('223.5.5.5', 'i'); -- 阿里云
+select udf_ip2region('1.1.1.1', 'en') -- Australia
+select udf_ip2region('1.1.1.1', 'm2'); -- AU
+select udf_ip2region('1.1.1.1', 'm3'); -- AUS
+select udf_ip2region('1.1.1.1', 'digit'); -- 36
 ```
 
 ### mobile2region
@@ -219,14 +259,14 @@ udf_mobile2region(tel, [province|p|city|c|isp|i])
 以下是一些查询例子
 
 ```sql
-select udf_mobile2region('13410774560'); 		-- 广东|深圳|中国移动
-select udf_mobile2region('13011'); 					-- NULL
-select udf_mobile2region('18945871234','p'); -- 黑龙江
-select udf_mobile2region('18945871234','c'); -- 伊春
-select udf_mobile2region('18945871234','i'); -- 中国电信
+select udf_mobile2region('13410774560'); -- 广东|深圳|中国移动
+select udf_mobile2region('13011'); -- NULL
+select udf_mobile2region('18945871234', 'p'); -- 黑龙江
+select udf_mobile2region('18945871234', 'c'); -- 伊春
+select udf_mobile2region('18945871234', 'i'); -- 中国电信
 ```
 
-###  证券交易日相关函数
+### 证券交易日相关函数
 
 这里的函数都和中国大陆证券交易日相关的函数，国内证券交易日符合以下条件
 
@@ -234,8 +274,6 @@ select udf_mobile2region('18945871234','i'); -- 中国电信
 2. 调休中遇到双休日（比如周六要求上班）也不是双休日
 
 由于每年的调休不同，也就导致证券交易日没有固定的规律，需要有交易所在头一年年底下发到各券商，同时遇到一些特别情况，还有临时调整（比如2020年1月31日周五，农历初七，本应为交易日，但受疫情影响，调整为非交易日）。因此交易日之间的计算是证券相关数据分析必然会遇到的问题。下面的函数试图简化交易日期计算难度。
-
-
 
 #### udf_add_normal_days(string base_date, int n) -> string
 

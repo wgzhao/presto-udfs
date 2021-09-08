@@ -21,6 +21,12 @@ public class IsoSearcher
 
     private static volatile IsoSearcher instance;
 
+    private IsoSearcher()
+    {
+
+        this.readIsoCsv();
+    }
+
     public static IsoSearcher getInstance()
     {
         if (instance == null) {
@@ -31,12 +37,6 @@ public class IsoSearcher
             }
         }
         return instance;
-    }
-
-    private IsoSearcher()
-    {
-
-        this.readIsoCsv();
     }
 
     public void readIsoCsv()
@@ -52,9 +52,9 @@ public class IsoSearcher
             reader = new BufferedReader(inputStreamReader);//GBK
             reader.readLine();//显示标题行
 
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
-                String item[] = line.split(","); //CSV格式文件时候的分割符
+                String[] item = line.split(","); //CSV格式文件时候的分割符
 
                 IsoDto iso = new IsoDto();
 

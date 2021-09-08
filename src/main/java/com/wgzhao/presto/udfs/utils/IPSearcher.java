@@ -10,10 +10,19 @@ import java.util.Objects;
 
 public class IPSearcher
 {
+    private static final Object mutex = new Object();
+    private static volatile IPSearcher instance;
     private final DbSearcher dbSearcher;
 
-    private static volatile IPSearcher instance;
-    private static final Object mutex = new Object();
+    private IPSearcher(String filepath)
+            throws DbMakerConfigException, IOException
+    {
+        DbConfig config = new DbConfig();
+        byte[] dbData = Objects.requireNonNull(IPSearcher.class.getResourceAsStream(filepath)).readAllBytes();
+        this.dbSearcher = new DbSearcher(config, dbData);
+        // load into memory when first query
+        this.dbSearcher.memorySearch("127.0.0.1");
+    }
 
     public static IPSearcher getInstance(String filepath)
     {
@@ -29,27 +38,18 @@ public class IPSearcher
                 return result;
             }
             return instance;
-        } catch (DbMakerConfigException  | IOException e) {
+        }
+        catch (DbMakerConfigException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private IPSearcher(String filepath)
-            throws DbMakerConfigException, IOException
-    {
-        DbConfig config = new DbConfig();
-        byte[] dbData = Objects.requireNonNull(IPSearcher.class.getResourceAsStream(filepath)).readAllBytes();
-        this.dbSearcher = new DbSearcher(config, dbData);
-        // load into memory when first query
-        this.dbSearcher.memorySearch("127.0.0.1");
-
     }
 
     public DataBlock lookup(String ipStr)
     {
         try {
             return this.dbSearcher.memorySearch(ipStr);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }
@@ -58,7 +58,8 @@ public class IPSearcher
     {
         try {
             return this.dbSearcher.memorySearch(ipLong);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }

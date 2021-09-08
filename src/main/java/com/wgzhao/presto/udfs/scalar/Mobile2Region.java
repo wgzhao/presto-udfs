@@ -75,7 +75,7 @@ public class Mobile2Region
     }
 
     @Description("get region from mobile phone")
-    @ScalarFunction("mobile2region")
+    @ScalarFunction("udf_mobile2region")
     @SqlType(StandardTypes.VARCHAR)
     public static @SqlNullable
     Slice mobile2region(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice phone)
@@ -92,7 +92,7 @@ public class Mobile2Region
     }
 
     @Description("get region from mobile phone")
-    @ScalarFunction("mobile2region")
+    @ScalarFunction("udf_mobile2region")
     @SqlType(StandardTypes.VARCHAR)
     public static @SqlNullable
     Slice mobile2region(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice phone,

@@ -26,36 +26,62 @@ import io.prestosql.spi.type.StandardTypes;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 
 import static io.airlift.slice.Slices.utf8Slice;
 
-public class IPFunction {
+public class IPFunction
+{
     private IPFunction() {}
 
     @Description("get region from IP Address")
-    @ScalarFunction("ip_to_int")
-    @SqlType(StandardTypes.INTEGER)
-    public static long ip2int(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice ipStr ) throws IOException
+    @ScalarFunction("udf_ip2int")
+    @SqlType(StandardTypes.BIGINT)
+    public @SqlNullable
+    static Long ip2int(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice ipStr)
     {
         if (ipStr == null || ipStr.toStringUtf8().equals("")) {
-            return 0L;
+            return null;
         }
-        InetAddress i= InetAddress.getByName(ipStr.toStringUtf8());
-        return ByteBuffer.wrap(i.getAddress()).getLong();
+        String[] ip = ipStr.toStringUtf8().split("\\.");
+        if (ip.length != 4) {
+            return null;
+        }
+        long result = 0;
+        try {
+            for (String part : ip) {
+                result = result << 8;
+                result |= Integer.parseInt(part);
+            }
+            return result;
+        }
+        catch (NumberFormatException ignored) {
+            return null;
+        }
     }
 
     @Description("get region from IP Address")
-    @ScalarFunction("int_to_ip")
+    @ScalarFunction("udf_int2ip")
     @SqlType(StandardTypes.VARCHAR)
-    public static @SqlNullable Slice int2ip(@SqlType(StandardTypes.INTEGER) long ip) throws IOException
+    public static Slice int2ip(@SqlNullable @SqlType(StandardTypes.INTEGER) Long ip)
     {
-        if (ip < 0) {
+        if (ip == null || ip < 0) {
             return null;
         }
-        InetAddress i = InetAddress.getByName(String.valueOf(ip));
-        String ipStr= i.getHostAddress();
-        return  utf8Slice(ipStr);
+
+        try {
+            InetAddress i = InetAddress.getByName(String.valueOf(ip));
+            String ipStr = i.getHostAddress();
+            return utf8Slice(ipStr);
+        }
+        catch (IOException ignored) {
+            return null;
+        }
     }
 
+    public static void main(String[] args)
+    {
+        int a = 1;
+        a |= 0;
+        System.out.println(a);
+    }
 }

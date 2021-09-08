@@ -39,7 +39,7 @@ public class ExtendedDateTimeFunctions
     {
         ZoneId zoneId = ZoneId.of(inputZoneId.toStringUtf8(), ZoneId.SHORT_IDS);
         long offsetTimestamp = packDateTimeWithZone(timestamp, zoneId.toString());
-        return  timestamp + ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
+        return timestamp + ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
                 + PrestoDateTimeFunctions.timeZoneMinuteFromTimestampWithTimeZone(offsetTimestamp)) * 60) * 1000;
     }
 
@@ -51,7 +51,7 @@ public class ExtendedDateTimeFunctions
         Timestamp javaTimestamp = Timestamp.valueOf(inputTimestamp.toStringUtf8());
         ZoneId zoneId = ZoneId.of(inputZoneId.toStringUtf8(), ZoneId.SHORT_IDS);
         long offsetTimestamp = packDateTimeWithZone(javaTimestamp.getTime(), zoneId.toString());
-        return  javaTimestamp.getTime() + ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
+        return javaTimestamp.getTime() + ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
                 + PrestoDateTimeFunctions.timeZoneMinuteFromTimestampWithTimeZone(offsetTimestamp)) * 60) * 1000;
     }
 
@@ -61,7 +61,7 @@ public class ExtendedDateTimeFunctions
     public static long toUtcTimestamp(@SqlType(StandardTypes.TIMESTAMP) long timestamp, @SqlType(StandardTypes.VARCHAR) Slice inputZoneId)
     {
         ZoneId zoneId = ZoneId.of(inputZoneId.toStringUtf8(), ZoneId.SHORT_IDS);
-        long offsetTimestamp =  packDateTimeWithZone(timestamp, zoneId.toString());
+        long offsetTimestamp = packDateTimeWithZone(timestamp, zoneId.toString());
         return timestamp - ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
                 + PrestoDateTimeFunctions.timeZoneMinuteFromTimestampWithTimeZone(offsetTimestamp)) * 60) * 1000;
     }
@@ -74,7 +74,7 @@ public class ExtendedDateTimeFunctions
         Timestamp javaTimestamp = Timestamp.valueOf(inputTimestamp.toStringUtf8());
         ZoneId zoneId = ZoneId.of(inputZoneId.toStringUtf8(), ZoneId.SHORT_IDS);
         long offsetTimestamp = packDateTimeWithZone(javaTimestamp.getTime(), zoneId.toString());
-        return  javaTimestamp.getTime() - ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
+        return javaTimestamp.getTime() - ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
                 + PrestoDateTimeFunctions.timeZoneMinuteFromTimestampWithTimeZone(offsetTimestamp)) * 60) * 1000;
     }
 }

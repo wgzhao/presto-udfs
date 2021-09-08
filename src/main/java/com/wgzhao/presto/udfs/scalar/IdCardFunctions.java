@@ -28,12 +28,12 @@ import io.prestosql.spi.type.StandardTypes;
 /**
  * 身份证校验，对于合法的身份证返回true，否则返回false，对于空身份证，则返回null
  */
-public class IdCheck
+public class IdCardFunctions
 {
-    private IdCheck() {}
+    private IdCardFunctions() {}
 
     @Description("Check IdCard is valid or not")
-    @ScalarFunction("id_check")
+    @ScalarFunction("udf_is_idcard")
     @SqlType(StandardTypes.BOOLEAN)
     public static boolean idCheck(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice idNo)
     {
@@ -44,27 +44,30 @@ public class IdCheck
     }
 
     /**
-     * 提取身份证号码里的生日，格式为 <code>yyyyMMdd</code>, 如果给定的身份证为空或不合法，则返回为0
+     * 提取身份证号码里的生日，格式为 <code>yyyyMMdd</code>, 如果给定的身份证为空或不合法，则返回为 NULL
+     *
      * @param idNo 身份证号码，支持中国大陆身份证（15位和18位）以及港澳台的10位证件号码
      * @return 生日（code>yyyyMMdd</code>）
      */
     @Description("Extract birthday from valid ID card")
-    @ScalarFunction("get_birthday")
+    @ScalarFunction("udf_get_birthday")
     @SqlType(StandardTypes.INTEGER)
-    public static long getBirthFromIdCard(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice idNo)
+    public @SqlNullable
+    static Long getBirthFromIdCard(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice idNo)
     {
         if (idNo == null) {
-            return 0;
+            return null;
         }
         String prettyId = idNo.toStringUtf8().trim();
-        if (! IdCardUtil.isValidCard(prettyId)) {
-            return 0;
+        if (!IdCardUtil.isValidCard(prettyId)) {
+            return null;
         }
-        String birthday =  IdCardUtil.getBirth(prettyId);
+        String birthday = IdCardUtil.getBirth(prettyId);
         if (birthday == null) {
-            return 0;
-        } else {
-            return Integer.parseInt(birthday);
+            return null;
+        }
+        else {
+            return  Long.getLong(birthday);
         }
     }
 }

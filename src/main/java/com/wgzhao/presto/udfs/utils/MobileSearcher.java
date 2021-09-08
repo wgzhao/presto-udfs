@@ -10,10 +10,19 @@ import me.ihxq.projects.pna.algorithm.LookupAlgorithm;
  */
 public class MobileSearcher
 {
+    private static final Object mutex = new Object();
+    private static volatile MobileSearcher instance;
     private final PhoneNumberLookup phoneNumberLookup;
 
-    private static volatile MobileSearcher instance;
-    private static final Object mutex = new Object();
+    private MobileSearcher()
+    {
+        this(new BinarySearchAlgorithmImpl());
+    }
+
+    private MobileSearcher(LookupAlgorithm lookupAlgorithm)
+    {
+        this.phoneNumberLookup = new PhoneNumberLookup(lookupAlgorithm);
+    }
 
     public static MobileSearcher getInstance()
     {
@@ -28,16 +37,6 @@ public class MobileSearcher
             return result;
         }
         return instance;
-    }
-
-    private MobileSearcher()
-    {
-        this(new BinarySearchAlgorithmImpl());
-    }
-
-    private MobileSearcher(LookupAlgorithm lookupAlgorithm)
-    {
-        this.phoneNumberLookup = new PhoneNumberLookup(lookupAlgorithm);
     }
 
     public PhoneNumberInfo lookup(String phoneNumber)

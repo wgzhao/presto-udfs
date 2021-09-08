@@ -43,15 +43,26 @@ import static io.prestosql.spi.type.TimeZoneKey.getTimeZoneKeys;
 // This is copy of PrestoDateTimeZoneIndex because presto does not provide presto-main jars to plugins anymore
 public final class PrestoDateTimeZoneIndex
 {
+    private static final DateTimeZone[] DATE_TIME_ZONES;
+    private static final ISOChronology[] CHRONOLOGIES;
+    private static final int[] FIXED_ZONE_OFFSET;
+    private static final int VARIABLE_ZONE = Integer.MAX_VALUE;
+
     private PrestoDateTimeZoneIndex()
     {
     }
 
-    private static final DateTimeZone[] DATE_TIME_ZONES;
-    private static final ISOChronology[] CHRONOLOGIES;
-    private static final int[] FIXED_ZONE_OFFSET;
+    public static int extractZoneOffsetMinutes(long dateTimeWithTimeZone)
+    {
+        short zoneKey = unpackZoneKey(dateTimeWithTimeZone).getKey();
 
-    private static final int VARIABLE_ZONE = Integer.MAX_VALUE;
+        if (FIXED_ZONE_OFFSET[zoneKey] == VARIABLE_ZONE) {
+            return DATE_TIME_ZONES[zoneKey].getOffset(unpackMillisUtc(dateTimeWithTimeZone)) / 60_000;
+        }
+        else {
+            return FIXED_ZONE_OFFSET[zoneKey];
+        }
+    }
 
     static {
         DATE_TIME_ZONES = new DateTimeZone[MAX_TIME_ZONE_KEY + 1];
@@ -61,7 +72,7 @@ public final class PrestoDateTimeZoneIndex
             short zoneKey = timeZoneKey.getKey();
             DateTimeZone dateTimeZone;
             try {
-                 dateTimeZone = DateTimeZone.forID(timeZoneKey.getId());
+                dateTimeZone = DateTimeZone.forID(timeZoneKey.getId());
             }
             catch (IllegalArgumentException e) {
                 // This can stop this Class from loading and
@@ -76,28 +87,6 @@ public final class PrestoDateTimeZoneIndex
             else {
                 FIXED_ZONE_OFFSET[zoneKey] = VARIABLE_ZONE;
             }
-        }
-    }
-
-    public static ISOChronology getChronology(TimeZoneKey zoneKey)
-    {
-        return CHRONOLOGIES[zoneKey.getKey()];
-    }
-
-    public static ISOChronology unpackChronology(long timestampWithTimeZone)
-    {
-        return getChronology(unpackZoneKey(timestampWithTimeZone));
-    }
-
-    public static int extractZoneOffsetMinutes(long dateTimeWithTimeZone)
-    {
-        short zoneKey = unpackZoneKey(dateTimeWithTimeZone).getKey();
-
-        if (FIXED_ZONE_OFFSET[zoneKey] == VARIABLE_ZONE) {
-            return DATE_TIME_ZONES[zoneKey].getOffset(unpackMillisUtc(dateTimeWithTimeZone)) / 60_000;
-        }
-        else {
-            return FIXED_ZONE_OFFSET[zoneKey];
         }
     }
 }

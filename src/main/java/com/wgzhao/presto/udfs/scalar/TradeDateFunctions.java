@@ -41,17 +41,17 @@ public class TradeDateFunctions
     {
     }
 
-
     /**
      * 计算在给定日期后的N天内的第一个交易日
-     *
+     * <p>
      * 如果N是正数，则往后计算；如果是负数，则往前计算
-     *
+     * <p>
      * 示例：
      * <pre>{@code
      *  select udf_add_normal_days('20210903', 4); -- 20210907
      *  select udf_add_normal_days('20210906', -1) -- 20210903
      * }</pre>
+     *
      * @param baseDate 给定的日期, 格式为 yyyyMMdd
      * @param days 指定的天数，正数表示往后计算，负数表示往前计算
      * @return 交易日，如果没有找到，则返回为 null
@@ -77,6 +77,7 @@ public class TradeDateFunctions
     /**
      * 返回两个给定的第一个日期（包括）和第二个日期（包括）之间有多少个交易日
      * 给定的两个日期有任意一个为 null 或为空，均返回为 null
+     *
      * @param d1 第一个日期
      * @param d2 第二个日期
      * @return 交易日数量
@@ -183,7 +184,6 @@ public class TradeDateFunctions
         return utf8Slice(res);
     }
 
-
     @Description("is close day or not")
     @ScalarFunction("udf_is_trade_date")
     @SqlType(StandardTypes.BOOLEAN)
@@ -205,5 +205,4 @@ public class TradeDateFunctions
         String res = toJSONString(smap);
         return utf8Slice(res);
     }
-
 }

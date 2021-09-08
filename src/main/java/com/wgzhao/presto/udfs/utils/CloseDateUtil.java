@@ -18,23 +18,6 @@ public class CloseDateUtil
 
     private static final List<String> closeDateList = new ArrayList<>();
 
-    static {
-        InputStream in = null;
-        try {
-            in = CloseDateUtil.class.getResourceAsStream(closePath);
-            closeDateList.addAll(IOUtils.readLines(in, StandardCharsets.UTF_8));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("CloseDateUtil init failed", e);
-        }
-        finally {
-            if (in != null) {
-                IOUtils.closeQuietly(in, null);
-            }
-        }
-    }
-
     public static boolean isCloseDate(final String date)
     {
         return closeDateList.contains(date);
@@ -45,7 +28,7 @@ public class CloseDateUtil
         String nextDate = nextDay(date);
         while (!isCloseDate(nextDate)) {
             nextDate = nextDay(nextDate);
-            if (nextDate.compareTo(getMaxExchangeDay()) >0) {
+            if (nextDate.compareTo(getMaxExchangeDay()) > 0) {
                 return null;
             }
         }
@@ -113,7 +96,6 @@ public class CloseDateUtil
         }
         return lastDate;
     }
-
 
     public static String addDate(final String date, final int days)
     {
@@ -211,5 +193,22 @@ public class CloseDateUtil
     public static String getMinExchangeDay()
     {
         return closeDateList.get(0);
+    }
+
+    static {
+        InputStream in = null;
+        try {
+            in = CloseDateUtil.class.getResourceAsStream(closePath);
+            closeDateList.addAll(IOUtils.readLines(in, StandardCharsets.UTF_8));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("CloseDateUtil init failed", e);
+        }
+        finally {
+            if (in != null) {
+                IOUtils.closeQuietly(in, null);
+            }
+        }
     }
 }

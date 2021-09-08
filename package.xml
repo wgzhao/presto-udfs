@@ -5,32 +5,41 @@
     <id>release</id>
     <formats>
         <format>zip</format>
+        <format>dir</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>extra</outputDirectory>
+        </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
                 <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
-            <outputDirectory>.</outputDirectory>
+            <outputDirectory>extra</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>.</outputDirectory>
+            <outputDirectory>extra</outputDirectory>
             <scope>runtime</scope>
-<!--            <includes>-->
-<!--                <include>org.slf4j:slf4j-api</include>-->
-<!--                <include>io.airlift:log</include>-->
-<!--                <include>com.google.guava:guava</include>-->
-<!--                <include>commons-io:commons-io</include>-->
-<!--                <include>joda-time:joda-time</include>-->
-<!--                <include>me.ihxq.projects:phone-number-geo</include>-->
-<!--                <include>org.lionsoul:ip2region</include>-->
-<!--            </includes>-->
+            <includes>
+                <include>org.slf4j:slf4j-api</include>
+                <include>io.airlift:log</include>
+                <include>com.google.guava:guava</include>
+                <include>commons-io:commons-io</include>
+                <include>joda-time:joda-time</include>
+                <include>me.ihxq.projects:phone-number-geo</include>
+                <include>org.lionsoul:ip2region</include>
+                <include>io.prestosql:presto-plugin-toolkit</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 </assembly>

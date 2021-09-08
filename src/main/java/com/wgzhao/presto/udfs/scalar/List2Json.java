@@ -18,7 +18,6 @@
 package com.wgzhao.presto.udfs.scalar;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import io.airlift.slice.Slice;
 import io.airlift.slice.Slices;
 import io.prestosql.spi.function.Description;
@@ -28,10 +27,6 @@ import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.StandardTypes;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static io.airlift.slice.Slices.utf8Slice;
 

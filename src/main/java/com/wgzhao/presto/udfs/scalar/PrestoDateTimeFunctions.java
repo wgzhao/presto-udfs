@@ -31,159 +31,23 @@
  */
 package com.wgzhao.presto.udfs.scalar;
 
-import io.prestosql.spi.PrestoException;
-import com.google.common.primitives.Ints;
-import io.airlift.slice.Slice;
-import io.prestosql.spi.connector.ConnectorSession;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.field.DividedDateTimeField;
 import org.joda.time.field.OffsetDateTimeField;
 import org.joda.time.field.ScaledDurationField;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
-import java.util.Locale;
-
-import static io.prestosql.spi.StandardErrorCode.INVALID_FUNCTION_ARGUMENT;
-import static io.prestosql.spi.type.DateTimeEncoding.unpackMillisUtc;
 import static com.wgzhao.presto.udfs.scalar.PrestoDateTimeZoneIndex.extractZoneOffsetMinutes;
-import static com.wgzhao.presto.udfs.scalar.PrestoDateTimeZoneIndex.getChronology;
-import static com.wgzhao.presto.udfs.scalar.PrestoDateTimeZoneIndex.unpackChronology;
-import static io.airlift.slice.Slices.utf8Slice;
-import static java.util.Locale.ENGLISH;
-import static java.util.concurrent.TimeUnit.DAYS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.joda.time.DateTimeZone.UTC;
 
 // This is copy of DateTimeFunctions because presto does not provide presto-main jars to plugins anymore
 public final class PrestoDateTimeFunctions
 {
-    private static final ISOChronology UTC_CHRONOLOGY = ISOChronology.getInstance(UTC);
-    private static final int MILLISECONDS_IN_SECOND = 1000;
-    private static final int MILLISECONDS_IN_MINUTE = 60 * MILLISECONDS_IN_SECOND;
-    private static final int MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTE;
-
     public static final DateTimeFieldType QUARTER_OF_YEAR = new QuarterOfYearDateTimeField();
 
     private PrestoDateTimeFunctions() {}
-
-    public static double toUnixTimeFromTimestampWithTimeZone(long timestampWithTimeZone)
-    {
-        return unpackMillisUtc(timestampWithTimeZone) / 1000.0;
-    }
-
-    public static Slice toISO8601FromDate(ConnectorSession session,  long date)
-    {
-        DateTimeFormatter formatter = ISODateTimeFormat.date()
-                .withChronology(UTC_CHRONOLOGY);
-        return utf8Slice(formatter.print(DAYS.toMillis(date)));
-    }
-
-    public static long addFieldValueDate(ConnectorSession session,  Slice unit,  long value,  long date)
-    {
-        long millis = getDateField(UTC_CHRONOLOGY, unit).add(DAYS.toMillis(date), Ints.checkedCast(value));
-        return MILLISECONDS.toDays(millis);
-    }
-
-    public static long diffDate(ConnectorSession session, Slice unit,  long date1,  long date2)
-    {
-        return getDateField(UTC_CHRONOLOGY, unit).getDifferenceAsLong(DAYS.toMillis(date2), DAYS.toMillis(date1));
-    }
-
-    public static long diffTimestamp(
-            ConnectorSession session,
-            Slice unit,
-            long timestamp1,
-            long timestamp2)
-    {
-        return getTimestampField(getChronology(session.getTimeZoneKey()), unit).getDifferenceAsLong(timestamp2, timestamp1);
-    }
-
-    public static long diffTimestampWithTimeZone(
-            Slice unit,
-            long timestampWithTimeZone1,
-            long timestampWithTimeZone2)
-    {
-        return getTimestampField(unpackChronology(timestampWithTimeZone1), unit).getDifferenceAsLong(unpackMillisUtc(timestampWithTimeZone2), unpackMillisUtc(timestampWithTimeZone1));
-    }
-
-    private static DateTimeField getDateField(ISOChronology chronology, Slice unit)
-    {
-        String unitString = unit.toStringUtf8().toLowerCase(ENGLISH);
-        switch (unitString) {
-            case "day":
-                return chronology.dayOfMonth();
-            case "week":
-                return chronology.weekOfWeekyear();
-            case "month":
-                return chronology.monthOfYear();
-            case "quarter":
-                return QUARTER_OF_YEAR.getField(chronology);
-            case "year":
-                return chronology.year();
-        }
-        throw new PrestoException(INVALID_FUNCTION_ARGUMENT, "'" + unitString + "' is not a valid DATE field");
-    }
-
-    private static DateTimeField getTimestampField(ISOChronology chronology, Slice unit)
-    {
-        String unitString = unit.toStringUtf8().toLowerCase(ENGLISH);
-        switch (unitString) {
-            case "millisecond":
-                return chronology.millisOfSecond();
-            case "second":
-                return chronology.secondOfMinute();
-            case "minute":
-                return chronology.minuteOfHour();
-            case "hour":
-                return chronology.hourOfDay();
-            case "day":
-                return chronology.dayOfMonth();
-            case "week":
-                return chronology.weekOfWeekyear();
-            case "month":
-                return chronology.monthOfYear();
-            case "quarter":
-                return QUARTER_OF_YEAR.getField(chronology);
-            case "year":
-                return chronology.year();
-        }
-        throw new PrestoException(INVALID_FUNCTION_ARGUMENT, "'" + unitString + "' is not a valid Timestamp field");
-    }
-
-    public static Slice formatDatetime(ConnectorSession session, long timestamp, Slice formatString)
-    {
-        return formatDatetime(getChronology(session.getTimeZoneKey()), session.getLocale(), timestamp, formatString);
-    }
-
-    private static Slice formatDatetime(ISOChronology chronology, Locale locale, long timestamp, Slice formatString)
-    {
-        try {
-            return utf8Slice(DateTimeFormat.forPattern(formatString.toStringUtf8())
-                    .withChronology(chronology)
-                    .withLocale(locale)
-                    .print(timestamp));
-        }
-        catch (IllegalArgumentException e) {
-            throw new PrestoException(INVALID_FUNCTION_ARGUMENT, e);
-        }
-    }
-
-    public static long weekFromTimestamp(ConnectorSession session, long timestamp)
-    {
-        return getChronology(session.getTimeZoneKey()).weekOfWeekyear().get(timestamp);
-    }
-
-    public static long weekFromTimestampWithTimeZone(long timestampWithTimeZone)
-    {
-        return unpackChronology(timestampWithTimeZone).weekOfWeekyear().get(unpackMillisUtc(timestampWithTimeZone));
-    }
 
     public static long timeZoneMinuteFromTimestampWithTimeZone(long timestampWithTimeZone)
     {

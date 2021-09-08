@@ -27,32 +27,30 @@ import io.prestosql.spi.function.SqlNullable;
 import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.StandardTypes;
 import org.lionsoul.ip2region.DataBlock;
-import org.lionsoul.ip2region.Util;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static io.airlift.slice.Slices.utf8Slice;
+import static java.util.Map.entry;
 
-public class IP2Region
+public class IP2RegionFunction
 {
     private static final String FILE_NAME = "/ip2region.db";
-    private static final HashMap<String, Integer> gMap = new HashMap<>();
+    private static final Map<String, Integer> gMap = Map.ofEntries(
+        entry("country", 0),
+        entry("g",0),
+        entry("province",2),
+        entry("p",2),
+        entry("city",3),
+        entry("c",3),
+        entry("isp",4),
+        entry("i",4)
+    );
 
-    static {
-        gMap.put("country", 0);
-        gMap.put("g", 0);
-        gMap.put("province", 2);
-        gMap.put("p", 2);
-        gMap.put("city", 3);
-        gMap.put("c", 3);
-        gMap.put("isp", 4);
-        gMap.put("i", 4);
-    }
+    private static final io.airlift.log.Logger logger = io.airlift.log.Logger.get(IP2RegionFunction.class);
 
-    private static final io.airlift.log.Logger logger = io.airlift.log.Logger.get(IP2Region.class);
-
-    private IP2Region() {}
+    private IP2RegionFunction() {}
 
     private static String ipSearch(String ip, String segment)
     {
@@ -74,7 +72,7 @@ public class IP2Region
         }
         // 城市Id|国家|区域|省份|城市|ISP
         String[] arrInfo = result.split("\\|");
-        gMap.forEach((k, v) -> ipInfo.put(k, arrInfo[v].equals("0") ? null: arrInfo[v]));
+        gMap.forEach((k, v) -> ipInfo.put(k, arrInfo[v].equals("0") ? null : arrInfo[v]));
 
         //检查是否是需要返回区域信息
         if (gMap.containsKey(segment)) {
@@ -91,7 +89,7 @@ public class IP2Region
     }
 
     @Description("get region from IP Address")
-    @ScalarFunction("ip2region")
+    @ScalarFunction("udf_ip2region")
     @SqlType(StandardTypes.VARCHAR)
     public static @SqlNullable
     Slice ip2region(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice ip)
@@ -99,7 +97,7 @@ public class IP2Region
         if (ip == null || ip.toStringUtf8().trim().isEmpty()) {
             return null;
         }
-        if (!Util.isIpAddress(ip.toStringUtf8())) {
+        if (!isIpAddress(ip.toStringUtf8())) {
             logger.warn("invalid IP address: " + ip.toStringUtf8());
             return null;
         }
@@ -111,7 +109,7 @@ public class IP2Region
     }
 
     @Description("get region from IP Address")
-    @ScalarFunction("ip2region")
+    @ScalarFunction("udf_ip2region")
     @SqlType(StandardTypes.VARCHAR)
     public static @SqlNullable
     Slice ip2region(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice ip, @SqlNullable @SqlType(StandardTypes.VARCHAR) Slice segment)
@@ -122,7 +120,7 @@ public class IP2Region
         if (ip.toStringUtf8().trim().isEmpty() || segment.toStringUtf8().trim().isEmpty()) {
             return null;
         }
-        if (!Util.isIpAddress(ip.toStringUtf8())) {
+        if (! isIpAddress(ip.toStringUtf8())) {
             logger.warn("invalid IP address: " + ip.toStringUtf8());
             return null;
         }
@@ -132,5 +130,18 @@ public class IP2Region
             return Slices.EMPTY_SLICE;
         }
         return utf8Slice(result);
+    }
+
+    private static boolean isIpAddress(String ip)
+    {
+        try {
+            for (String part : ip.split("\\.")) {
+                Integer.parseInt(part);
+            }
+            return true;
+        }
+        catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 }

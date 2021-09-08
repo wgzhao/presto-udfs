@@ -22,20 +22,14 @@ import io.prestosql.spi.function.ScalarFunction;
 import io.prestosql.spi.function.SqlNullable;
 import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.StandardTypes;
-import io.airlift.slice.Slice;
-import io.airlift.slice.Slices;
 
-import java.util.Random;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public class ExtendedMathematicFunctions
+public class ExtendedMathematicaFunctions
 {
-    private ExtendedMathematicFunctions() {}
+    private ExtendedMathematicaFunctions() {}
 
     @SqlNullable
     @Description("Returns the positive value of a mod b.")
-    @ScalarFunction("pmod")
+    @ScalarFunction("udf_pmod")
     @SqlType(StandardTypes.BIGINT)
     public static Long positiveModulus(@SqlType(StandardTypes.BIGINT) long a, @SqlType(StandardTypes.BIGINT) long b)
     {
@@ -47,7 +41,7 @@ public class ExtendedMathematicFunctions
 
     @SqlNullable
     @Description("Returns the positive value of a mod b ")
-    @ScalarFunction("pmod")
+    @ScalarFunction("udf_pmod")
     @SqlType(StandardTypes.DOUBLE)
     public static Double positiveModulusDouble(@SqlType(StandardTypes.DOUBLE) double a, @SqlType(StandardTypes.DOUBLE) double b)
     {

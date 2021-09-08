@@ -17,8 +17,8 @@
  */
 package com.wgzhao.presto.udfs.window;
 
-import io.prestosql.spi.block.BlockBuilder;
-import io.prestosql.spi.function.ValueWindowFunction;
+import io.trino.spi.block.BlockBuilder;
+import io.trino.spi.function.ValueWindowFunction;
 
 import java.util.List;
 

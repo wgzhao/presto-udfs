@@ -38,7 +38,7 @@
                 <include>joda-time:joda-time</include>
                 <include>me.ihxq.projects:phone-number-geo</include>
                 <include>org.lionsoul:ip2region</include>
-                <include>io.prestosql:presto-plugin-toolkit</include>
+                <include>io.trino:presto-plugin-toolkit</include>
             </includes>
         </dependencySet>
     </dependencySets>

@@ -31,14 +31,14 @@
  */
 package com.wgzhao.presto.udfs.scalar;
 
-import io.prestosql.spi.type.TimeZoneKey;
+import io.trino.spi.type.TimeZoneKey;
 import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.ISOChronology;
 
-import static io.prestosql.spi.type.DateTimeEncoding.unpackMillisUtc;
-import static io.prestosql.spi.type.DateTimeEncoding.unpackZoneKey;
-import static io.prestosql.spi.type.TimeZoneKey.MAX_TIME_ZONE_KEY;
-import static io.prestosql.spi.type.TimeZoneKey.getTimeZoneKeys;
+import static io.trino.spi.type.DateTimeEncoding.unpackMillisUtc;
+import static io.trino.spi.type.DateTimeEncoding.unpackZoneKey;
+import static io.trino.spi.type.TimeZoneKey.MAX_TIME_ZONE_KEY;
+import static io.trino.spi.type.TimeZoneKey.getTimeZoneKeys;
 
 // This is copy of PrestoDateTimeZoneIndex because presto does not provide presto-main jars to plugins anymore
 public final class PrestoDateTimeZoneIndex

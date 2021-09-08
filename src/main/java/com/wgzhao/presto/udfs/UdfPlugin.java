@@ -28,7 +28,7 @@ import com.wgzhao.presto.udfs.scalar.Mobile2Region;
 import com.wgzhao.presto.udfs.scalar.TradeDateFunctions;
 import com.wgzhao.presto.udfs.window.FirstNonNullValueFunction;
 import com.wgzhao.presto.udfs.window.LastNonNullValueFunction;
-import io.prestosql.spi.Plugin;
+import io.trino.spi.Plugin;
 
 import java.util.Set;
 

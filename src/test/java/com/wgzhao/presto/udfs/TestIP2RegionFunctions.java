@@ -20,10 +20,10 @@ package com.wgzhao.presto.udfs;
 
 import org.junit.jupiter.api.Test;
 
+import static com.wgzhao.presto.udfs.scalar.IP2RegionFunction.ip2region;
 import static io.airlift.slice.Slices.utf8Slice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static com.wgzhao.presto.udfs.scalar.IP2RegionFunction.ip2region;
 
 public class TestIP2RegionFunctions
 {
@@ -37,5 +37,9 @@ public class TestIP2RegionFunctions
         assertEquals("中国||北京|北京市|腾讯", ip2region(utf8Slice("119.29.29.29")).toStringUtf8());
         assertEquals("中国", ip2region(utf8Slice("119.29.29.29"), utf8Slice("g")).toStringUtf8());
         assertEquals("腾讯", ip2region(utf8Slice("119.29.29.29"), utf8Slice("i")).toStringUtf8());
+        assertEquals("China", ip2region(utf8Slice("119.29.29.29"), utf8Slice("en")).toStringUtf8());
+        assertEquals("CN", ip2region(utf8Slice("119.29.29.29"), utf8Slice("m2")).toStringUtf8());
+        assertEquals("CHN", ip2region(utf8Slice("119.29.29.29"), utf8Slice("m3")).toStringUtf8());
+        assertEquals("156", ip2region(utf8Slice("119.29.29.29"), utf8Slice("digit")).toStringUtf8());
     }
 }

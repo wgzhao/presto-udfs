@@ -16,7 +16,6 @@
 
 package com.wgzhao.presto.udfs.scalar;
 
-import com.wgzhao.presto.udfs.utils.CountryCodes;
 import com.wgzhao.presto.udfs.utils.IPSearcher;
 import com.wgzhao.presto.udfs.utils.IsoSearcher;
 import io.airlift.slice.Slice;
@@ -46,6 +45,13 @@ public class IP2RegionFunction
         entry("c",3),
         entry("isp",4),
         entry("i",4)
+    );
+
+    private static final Map<String, Integer> codeMap = Map.ofEntries(
+        entry("en", 0),
+        entry("m2", 1),
+        entry("m3", 2),
+        entry("digit", 3)
     );
 
     private static final io.airlift.log.Logger logger = io.airlift.log.Logger.get(IP2RegionFunction.class);
@@ -80,7 +86,7 @@ public class IP2RegionFunction
         }
 
         //检查是否是需要返回国际编码信息
-        if (CountryCodes.isValidCode(segment)) {
+        if (codeMap.containsKey(segment)) {
             return IsoSearcher.getInstance().searcher(ipInfo.get("g"), segment);
         }
         //都不是，说明指定的返回编码出现未知情况，直接返回为空

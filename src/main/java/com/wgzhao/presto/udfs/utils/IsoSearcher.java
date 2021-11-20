@@ -6,10 +6,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by Administrator on 2020/3/23.
@@ -20,6 +23,7 @@ public class IsoSearcher
     public static Map<String, IsoDto> isoMap = new HashMap<>();
 
     private static volatile IsoSearcher instance;
+    private static final String FILE_NAME = "/iso3166.csv.gz";
 
     private IsoSearcher()
     {
@@ -42,18 +46,20 @@ public class IsoSearcher
     public void readIsoCsv()
     {
         InputStream inputStream = null;
-        InputStreamReader inputStreamReader = null;
-        BufferedReader reader = null;
+        BufferedReader buffered = null;
 
         try {
-            inputStream = IsoSearcher.class.getResourceAsStream("/iso3166.csv");
+            inputStream = IsoSearcher.class.getResourceAsStream(FILE_NAME);
 
-            inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            reader = new BufferedReader(inputStreamReader);//GBK
-            reader.readLine();//显示标题行
+            assert inputStream != null;
+            InputStream ins = new GZIPInputStream(inputStream);
+            Reader decoder = new InputStreamReader(ins, StandardCharsets.UTF_8);
+            buffered = new BufferedReader(decoder);
+            // skip header
+            buffered.readLine();
 
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = buffered.readLine()) != null) {
                 String[] item = line.split(","); //CSV格式文件时候的分割符
 
                 IsoDto iso = new IsoDto();
@@ -75,11 +81,8 @@ public class IsoSearcher
                 if (inputStream != null) {
                     inputStream.close();
                 }
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
-                }
-                if (reader != null) {
-                    reader.close();
+                if (buffered != null) {
+                    buffered.close();
                 }
             }
             catch (IOException e) {

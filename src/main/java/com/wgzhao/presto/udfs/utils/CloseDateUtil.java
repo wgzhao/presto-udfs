@@ -2,17 +2,21 @@ package com.wgzhao.presto.udfs.utils;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class CloseDateUtil
 {
-    public static final String closePath = "/closedate.dat";
+    public static final String closePath = "/closedate.dat.gz";
 
     private static final io.airlift.log.Logger LOG = io.airlift.log.Logger.get(CloseDateUtil.class);
 
@@ -197,15 +201,27 @@ public class CloseDateUtil
 
     static {
         InputStream in = null;
+        BufferedReader buffered = null;
+        InputStream gzipStream = null;
         try {
             in = CloseDateUtil.class.getResourceAsStream(closePath);
-            closeDateList.addAll(IOUtils.readLines(in, StandardCharsets.UTF_8));
+            assert in != null;
+            gzipStream = new GZIPInputStream(in);
+            Reader decoder = new InputStreamReader(gzipStream, StandardCharsets.UTF_8);
+            buffered = new BufferedReader(decoder);
+            closeDateList.addAll(IOUtils.readLines(buffered));
         }
         catch (Exception e) {
             e.printStackTrace();
             LOG.error("CloseDateUtil init failed", e);
         }
         finally {
+            if (gzipStream != null) {
+                IOUtils.closeQuietly(gzipStream, null);
+            }
+            if (buffered != null) {
+                IOUtils.closeQuietly(buffered, null);
+            }
             if (in != null) {
                 IOUtils.closeQuietly(in, null);
             }

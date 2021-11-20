@@ -22,6 +22,11 @@ import com.wgzhao.presto.udfs.scalar.ExtendedStringFunctions;
 import io.airlift.slice.Slice;
 import org.junit.jupiter.api.Test;
 
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+
+import java.util.List;
+
 import static io.airlift.slice.Slices.utf8Slice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -46,5 +51,16 @@ public class TestStringFunctions
         assertEquals(35, res);
         assertNull(ExtendedStringFunctions.eval(utf8Slice("1+2i")));
         assertNull(ExtendedStringFunctions.eval(utf8Slice("23-")));
+    }
+
+    @Test
+    public void listAllScriptManager()
+    {
+        ScriptEngineManager sem = new ScriptEngineManager();
+        List<ScriptEngineFactory> factories = sem.getEngineFactories();
+        for (ScriptEngineFactory factory : factories)
+            System.out.println(factory.getEngineName() + " " + factory.getEngineVersion() + " " + factory.getNames());
+        if (factories.isEmpty())
+            System.out.println("No Script Engines found");
     }
 }

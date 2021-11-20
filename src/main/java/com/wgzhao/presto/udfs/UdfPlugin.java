@@ -26,6 +26,7 @@ import com.wgzhao.presto.udfs.scalar.List2Json;
 import com.wgzhao.presto.udfs.scalar.Map2Json;
 import com.wgzhao.presto.udfs.scalar.Mobile2Region;
 import com.wgzhao.presto.udfs.scalar.TradeDateFunctions;
+import com.wgzhao.presto.udfs.scalar.XmlFunctions;
 import com.wgzhao.presto.udfs.window.FirstNonNullValueFunction;
 import com.wgzhao.presto.udfs.window.LastNonNullValueFunction;
 import io.trino.spi.Plugin;
@@ -51,6 +52,7 @@ public class UdfPlugin
                 .add(TradeDateFunctions.class)
                 .add(IPFunction.class)
                 .add(IdCardFunctions.class)
+                .add(XmlFunctions.class)
                 .build();
     }
 }

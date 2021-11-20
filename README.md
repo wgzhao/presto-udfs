@@ -70,6 +70,15 @@ unzip -q -o udfs-<version>-release.zip -d /usr/lib/trino/plugin/
 | udf_pmod             | double      | double, double   | scalar        | true          | Returns the positive value of a mod b |
 | udf_to_chinese       | varchar     | varchar          | scalar        | true          | convert number string to chinese number string |
 | udf_to_chinese       | varchar     | varchar, boolean | scalar        | true          | convert number string to chinese number string |
+| udf_xpath            | array(varchar(x)) | varchar(x), varchar(y) | scalar        | true          | Returns a string array of values within xml nodes that match the xpath
+| udf_xpath_boolean    | boolean           | varchar(x), varchar(y) | scalar        | true          | Evaluates a boolean xpath expression
+| udf_xpath_double     | double            | varchar(x), varchar(y) | scalar        | true          | Returns a double value that matches the xpath expression
+| udf_xpath_float      | double            | varchar(x), varchar(y) | scalar        | true          | Returns a double value that matches the xpath expression
+| udf_xpath_int        | bigint            | varchar(x), varchar(y) | scalar        | true          | Returns a long value that matches the xpath expression
+| udf_xpath_long       | bigint            | varchar(x), varchar(y) | scalar        | true          | Returns a long value that matches the xpath expression
+| udf_xpath_number     | double            | varchar(x), varchar(y) | scalar        | true          | Returns a double value that matches the xpath expression
+| udf_xpath_str        | varchar           | varchar(x), varchar(y) | scalar        | true          | Returns a string value that matches the xpath expression
+| udf_xpath_string     | varchar           | varchar(x), varchar(y) | scalar        | true          | Returns a string value that matches the xpath expression
 
 ## 已经实现的 UDF
 
@@ -339,3 +348,24 @@ select udf_is_trade_date('20210904'); -- false
 select udf_is_trade_date('20210904'); -- false
 ```
 
+### xpath 相关函数
+
+这是一组用来使用 `xpath` 表达式来分析 xml 字符串的函数，其代码来自 [Apache Hive](https://github.com/apache/hive/blob/master/ql/src/java/org/apache/hadoop/hive/ql/udf/xml/)
+
+具体的用法，可以参考 [LanguageManual XPathUDF](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+XPathUDF)
+
+要注意的是，相对 Hive 的函数名而言，这里的函数都增加了 `udf_` 前缀
+
+这里列出函数的基本用法
+
+```sql
+select udf_xpath('<a><b>b1</b><b>b2</b></a>','a/*'); -- []
+select udf_xpath('<a><b>b1</b><b>b2</b></a>','a/*/text()'); -- [b1, b2]
+select udf_xpath('<a><b id="foo">b1</b><b id="bar">b2</b></a>','//@id'); -- [foot, bar]
+SELECT udf_xpath_string('<a><b>bb</b><c>cc</c></a>', 'a/b'); -- bb
+SELECT udf_xpath_string ('<a><b>bb</b><c>cc</c></a>', 'a'); -- bbcc
+SELECT udf_xpath_boolean ('<a><b>b</b></a>', 'a/b'); -- true
+SELECT udf_xpath_boolean ('<a><b>b</b></a>', 'a/c'); -- false
+SELECT udf_xpath_int('<a>b</a>', 'a = 10'); -- 0
+SELECT udf_xpath_int('<a><b class="odd">1</b><b class="even">2</b><b class="odd">4</b><c>8</c></a>', 'sum(a/*)'); -- 15
+```

@@ -15,11 +15,44 @@ public class TestXmlFunctions
 {
 
     @Test
-    public void testNullXPath() {
-        String xml = "<a><b>b1</b><b>b2</b><b>b3</b><c>c1</c><c>c2</c></a>";
+    public void testNullXPath()
+    {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<a><b>b1</b><b>b2</b>" +
+                "<b>b3</b><c>c1</c>" +
+                "<c>c2</c></a>";
         String xpath = "a/text()";
         final Block result = XmlFunctions.xpath(utf8Slice(xml), utf8Slice(xpath));
-        System.out.println(result.toString());
+        assertEquals(0, result.getPositionCount());
+    }
+    @Test
+    public void testXPathString() {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<java version=\"1.6.0_26\" class=\"java.beans.XMLDecoder\">" +
+                " <object class=\"java.util.HashMap\">" +
+                "  <void method=\"put\">" +
+                "   <string>fd_3630dadf1ad2d0</string>" +
+                "   <string>疑似不规范反馈</string>" +
+                "  </void>" +
+                "  <void method=\"put\">" +
+                "   <string>Type</string>" +
+                "   <string>疑似非本人开户</string>" +
+                "  </void>" +
+                "  <void method=\"put\">" +
+                "   <string>Department_Name</string>" +
+                "   <object class=\"java.util.HashMap\">" +
+                "    <void method=\"put\">" +
+                "     <string>name</string>" +
+                "     <string>长沙人民东路证券营业部</string>" +
+                "    </void>" +
+                "   </object>" +
+                "  </void>" +
+                " </object>" +
+                "</java>";
+        String xpath = "//string[text()=\"name\"]/following-sibling::string/text()";
+        Slice result2 = XmlFunctions.xpathString(utf8Slice(xml), utf8Slice(xpath));
+        assert result2 != null;
+        assertEquals( "长沙人民东路证券营业部", result2.toStringUtf8());
     }
 
     @Test

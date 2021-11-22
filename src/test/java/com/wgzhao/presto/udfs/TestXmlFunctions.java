@@ -3,7 +3,7 @@ package com.wgzhao.presto.udfs;
 import com.google.common.collect.ImmutableList;
 import com.wgzhao.presto.udfs.scalar.XmlFunctions;
 import io.airlift.slice.Slice;
-import io.trino.spi.block.Block;
+import io.prestosql.spi.block.Block;
 import org.junit.jupiter.api.Test;
 
 import static io.airlift.slice.Slices.utf8Slice;

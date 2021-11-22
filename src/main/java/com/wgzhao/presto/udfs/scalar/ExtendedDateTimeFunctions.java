@@ -18,15 +18,15 @@
 package com.wgzhao.presto.udfs.scalar;
 
 import io.airlift.slice.Slice;
-import io.trino.spi.function.Description;
-import io.trino.spi.function.ScalarFunction;
-import io.trino.spi.function.SqlType;
-import io.trino.spi.type.StandardTypes;
+import io.prestosql.spi.function.Description;
+import io.prestosql.spi.function.ScalarFunction;
+import io.prestosql.spi.function.SqlType;
+import io.prestosql.spi.type.StandardTypes;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
 
-import static io.trino.spi.type.DateTimeEncoding.packDateTimeWithZone;
+import static io.prestosql.spi.type.DateTimeEncoding.packDateTimeWithZone;
 
 public class ExtendedDateTimeFunctions
 {

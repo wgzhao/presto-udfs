@@ -18,11 +18,11 @@ package com.wgzhao.presto.udfs.scalar;
 
 import com.wgzhao.presto.udfs.utils.MobileSearcher;
 import io.airlift.slice.Slice;
-import io.trino.spi.function.Description;
-import io.trino.spi.function.ScalarFunction;
-import io.trino.spi.function.SqlNullable;
-import io.trino.spi.function.SqlType;
-import io.trino.spi.type.StandardTypes;
+import io.prestosql.spi.function.Description;
+import io.prestosql.spi.function.ScalarFunction;
+import io.prestosql.spi.function.SqlNullable;
+import io.prestosql.spi.function.SqlType;
+import io.prestosql.spi.type.StandardTypes;
 import me.ihxq.projects.pna.PhoneNumberInfo;
 
 import static io.airlift.slice.Slices.utf8Slice;

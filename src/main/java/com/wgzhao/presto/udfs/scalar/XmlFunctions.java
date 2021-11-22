@@ -2,18 +2,18 @@ package com.wgzhao.presto.udfs.scalar;
 
 import com.wgzhao.presto.udfs.utils.UDFXPathUtil;
 import io.airlift.slice.Slice;
-import io.trino.spi.block.Block;
-import io.trino.spi.block.BlockBuilder;
-import io.trino.spi.function.Description;
-import io.trino.spi.function.LiteralParameters;
-import io.trino.spi.function.ScalarFunction;
-import io.trino.spi.function.SqlNullable;
-import io.trino.spi.function.SqlType;
-import io.trino.spi.type.StandardTypes;
+import io.prestosql.spi.block.Block;
+import io.prestosql.spi.block.BlockBuilder;
+import io.prestosql.spi.function.Description;
+import io.prestosql.spi.function.LiteralParameters;
+import io.prestosql.spi.function.ScalarFunction;
+import io.prestosql.spi.function.SqlNullable;
+import io.prestosql.spi.function.SqlType;
+import io.prestosql.spi.type.StandardTypes;
 import org.w3c.dom.NodeList;
 
 import static io.airlift.slice.Slices.utf8Slice;
-import static io.trino.spi.type.VarcharType.VARCHAR;
+import static io.prestosql.spi.type.VarcharType.VARCHAR;
 
 /**
  * implementation of xml string operation function, migrate from hive function

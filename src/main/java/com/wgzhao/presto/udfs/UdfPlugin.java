@@ -29,7 +29,7 @@ import com.wgzhao.presto.udfs.scalar.TradeDateFunctions;
 import com.wgzhao.presto.udfs.scalar.XmlFunctions;
 import com.wgzhao.presto.udfs.window.FirstNonNullValueFunction;
 import com.wgzhao.presto.udfs.window.LastNonNullValueFunction;
-import io.trino.spi.Plugin;
+import io.prestosql.spi.Plugin;
 
 import java.util.Set;
 

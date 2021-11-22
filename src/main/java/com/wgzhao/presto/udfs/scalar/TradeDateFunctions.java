@@ -19,11 +19,11 @@ package com.wgzhao.presto.udfs.scalar;
 
 import com.wgzhao.presto.udfs.utils.CloseDateUtil;
 import io.airlift.slice.Slice;
-import io.trino.spi.function.Description;
-import io.trino.spi.function.ScalarFunction;
-import io.trino.spi.function.SqlNullable;
-import io.trino.spi.function.SqlType;
-import io.trino.spi.type.StandardTypes;
+import io.prestosql.spi.function.Description;
+import io.prestosql.spi.function.ScalarFunction;
+import io.prestosql.spi.function.SqlNullable;
+import io.prestosql.spi.function.SqlType;
+import io.prestosql.spi.type.StandardTypes;
 
 import java.io.IOException;
 import java.util.Map;

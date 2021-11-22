@@ -16,7 +16,7 @@
         <!--
             <air.main.basedir>${project.parent.basedir}</air.main.basedir>
         -->
-        <trino.version>358</trino.version>
+        <presto.version>348</presto.version>
         <slice.version>0.40</slice.version>
         <guava.version>30.0-jre</guava.version>
         <javax.inject.version>1</javax.inject.version>
@@ -55,15 +55,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.trino</groupId>
-            <artifactId>trino-spi</artifactId>
-            <version>${trino.version}</version>
+            <groupId>io.prestosql</groupId>
+            <artifactId>presto-spi</artifactId>
+            <version>${presto.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>io.trino</groupId>
-            <artifactId>trino-main</artifactId>
-            <version>${trino.version}</version>
+            <groupId>io.prestosql</groupId>
+            <artifactId>presto-main</artifactId>
+            <version>${presto.version}</version>
         </dependency>
 
         <dependency>

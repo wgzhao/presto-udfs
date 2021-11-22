@@ -17,7 +17,7 @@
  */
 package com.wgzhao.presto.udfs.window;
 
-import io.trino.spi.function.WindowFunctionSignature;
+import io.prestosql.spi.function.WindowFunctionSignature;
 
 import java.util.List;
 

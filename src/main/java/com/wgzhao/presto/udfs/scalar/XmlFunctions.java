@@ -21,8 +21,7 @@ import static io.trino.spi.type.VarcharType.VARCHAR;
  */
 public class XmlFunctions
 {
-    private static final UDFXPathUtil xpathUtil = new UDFXPathUtil();
-
+    private static final UDFXPathUtil xpathUtil = UDFXPathUtil.getInstance();
     private XmlFunctions() {}
 
     /**

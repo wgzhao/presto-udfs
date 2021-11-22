@@ -45,14 +45,41 @@ public class UDFXPathUtil
     public static final String SAX_FEATURE_PREFIX = "http://xml.org/sax/features/";
     public static final String EXTERNAL_GENERAL_ENTITIES_FEATURE = "external-general-entities";
     public static final String EXTERNAL_PARAMETER_ENTITIES_FEATURE = "external-parameter-entities";
-    private DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    private DocumentBuilder builder = null;
-    private XPath xpath = XPathFactory.newInstance().newXPath();
-    private ReusableStringReader reader = new ReusableStringReader();
-    private InputSource inputSource = new InputSource(reader);
+    //    private DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//    private DocumentBuilder builder = null;
+    private final XPath xpath = XPathFactory.newInstance().newXPath();
 
+    private static final Object mutex = new Object();
+    private static volatile UDFXPathUtil instance;
     private XPathExpression expression = null;
     private String oldPath = null;
+
+    private static final ThreadLocal<DocumentBuilder> docBuilderIns = ThreadLocal.withInitial(() -> {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature(SAX_FEATURE_PREFIX + EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+            dbf.setFeature(SAX_FEATURE_PREFIX + EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+            return dbf.newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    });
+
+    public static UDFXPathUtil getInstance()
+    {
+        UDFXPathUtil result = instance;
+        if (result == null) {
+            synchronized (mutex) {
+                result = instance;
+                if (result == null) {
+                    instance = result = new UDFXPathUtil();
+                }
+            }
+            return result;
+        }
+        return instance;
+    }
 
     public Object eval(String xml, String path, QName qname)
     {
@@ -78,20 +105,11 @@ public class UDFXPathUtil
             return null;
         }
 
-        if (builder == null) {
-            try {
-                initializeDocumentBuilderFactory();
-                builder = dbf.newDocumentBuilder();
-            }
-            catch (ParserConfigurationException e) {
-                throw new RuntimeException("Error instantiating DocumentBuilder, cannot build xml parser", e);
-            }
-        }
-
+        ReusableStringReader reader = new ReusableStringReader();
+        InputSource inputSource = new InputSource(reader);
         reader.set(xml);
-
         try {
-            return expression.evaluate(builder.parse(inputSource), qname);
+            return expression.evaluate(docBuilderIns.get().parse(inputSource), qname);
         }
         catch (XPathExpressionException e) {
             throw new RuntimeException("Invalid expression '" + oldPath + "'", e);
@@ -99,13 +117,6 @@ public class UDFXPathUtil
         catch (Exception e) {
             throw new RuntimeException("Error loading expression '" + oldPath + "'", e);
         }
-    }
-
-    private void initializeDocumentBuilderFactory()
-            throws ParserConfigurationException
-    {
-        dbf.setFeature(SAX_FEATURE_PREFIX + EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
-        dbf.setFeature(SAX_FEATURE_PREFIX + EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
     }
 
     public Boolean evalBoolean(String xml, String path)
@@ -134,7 +145,7 @@ public class UDFXPathUtil
     }
 
     /**
-     * Reusable, non-threadsafe version of {@link StringReader}.
+     * Reusable, non-thread-safe version of {@link StringReader}.
      */
     public static class ReusableStringReader
             extends Reader

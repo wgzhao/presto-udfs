@@ -46,6 +46,10 @@ public class XmlFunctions
         BlockBuilder parts = VARCHAR.createBlockBuilder(null, 1, xml.length());
         NodeList nodeList = xpathUtil.evalNodeList(xml.toStringUtf8(), path.toStringUtf8());
 
+        if (nodeList == null || nodeList.getLength() == 0) {
+            return parts.build();
+        }
+
         for (int i = 0; i < nodeList.getLength(); i++) {
             VARCHAR.writeSlice(parts, utf8Slice(nodeList.item(i).getNodeValue()));
         }

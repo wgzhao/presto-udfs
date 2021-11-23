@@ -1,15 +1,12 @@
 # Presto User-Defined Functions(UDFs)
 
-Presto/Trino 自定义函数，当前仅针对 [Trino/PrestoSQL](https://trino.io) 版本有有效， facebook版的 [prestodb](https://prestodb.io) 暂不支持。
+Presto/Trino 自定义函数，当前仅针对 [Trino](https://trino.io) 349及以后的版本有有效
+如果想编译兼容名为 `prestosql` 的版本，则可以执行
 
-## Trino/Presto 版本兼容性
-
-PrestoSQL 的版本终止在 `348` 版本，之后的版本取名为 `trino` ，两者不在兼容。 如果你在使用 `348`及之前的版本，请使用 `2.0.8` 版本，否则选择大于 `2.0.8` 版本的代码
-
-| Presto/Trino 版本  | UDF 版本 |
-| ------------- |:-------------:|
-| <= 348 |   2.0.8  |
-| > 348  | > 2.0.8 | 
+```shell
+bash build_for_presto.sh
+```
+脚本。该脚本执行完后，会在当前目录下，生产一个 `udfs-<version>-presto-348.zip` 的压缩文件。使用方式和下面描述一样。
 
 ## 使用方法
 

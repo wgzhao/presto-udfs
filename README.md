@@ -369,3 +369,9 @@ SELECT udf_xpath_boolean ('<a><b>b</b></a>', 'a/c'); -- false
 SELECT udf_xpath_int('<a>b</a>', 'a = 10'); -- 0
 SELECT udf_xpath_int('<a><b class="odd">1</b><b class="even">2</b><b class="odd">4</b><c>8</c></a>', 'sum(a/*)'); -- 15
 ```
+
+## 注意事项
+
+`src/main/resources/closedate.dat.gz` 文件存储的是从 2000 年开始到当年的所有交易日日期，每行一个日期。因此每到年底，需要将交易所下发的来年交易日追加到该文件中，并重新打包发布到生产环境。
+
+如果中途有交易日变更，也需要执行上述操作。

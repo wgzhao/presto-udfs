@@ -43,6 +43,25 @@ public class IdCardFunctions
         return IdCardUtil.isValidCard(idNo.toStringUtf8());
     }
 
+    @Description("Check ID Card is valid or not, return the birthday if valid else 0")
+    @ScalarFunction("id_check")
+    @SqlType(StandardTypes.BIGINT)
+    public static long idCheckWithBirthday(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice idNo)
+    {
+        if (idNo == null ) {
+            return 0L;
+        }
+        String prettyId = idNo.toStringUtf8().trim();
+        if (prettyId.isEmpty()) {
+            return 0L;
+        }
+        if (!IdCardUtil.isValidCard(idNo.toStringUtf8())) {
+            return 0L;
+        }
+        String birthday = IdCardUtil.getBirth(idNo.toStringUtf8());
+        return birthday == null ? 0L : Long.parseLong(birthday);
+    }
+
     /**
      * 提取身份证号码里的生日，格式为 <code>yyyyMMdd</code>, 如果给定的身份证为空或不合法，则返回为 NULL
      *
@@ -67,7 +86,7 @@ public class IdCardFunctions
             return null;
         }
         else {
-            return  Long.getLong(birthday);
+            return Long.parseLong(birthday);
         }
     }
 }

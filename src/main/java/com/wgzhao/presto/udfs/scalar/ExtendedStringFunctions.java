@@ -54,6 +54,10 @@ public class ExtendedStringFunctions
         try {
             // Adopt OpenJdk does not work
             ScriptEngine engine = manager.getEngineByName("js");
+            if (engine == null ) {
+                // current jdk does not support it
+                return null;
+            }
             return Double.parseDouble(engine.eval(evalStr).toString());
         }
         catch (ScriptException ignored) {

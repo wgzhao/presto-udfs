@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.alibaba.fastjson2.JSON.toJSONString;
 import static io.airlift.slice.Slices.utf8Slice;
 
 /**

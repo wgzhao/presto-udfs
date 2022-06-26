@@ -20,12 +20,14 @@ package com.wgzhao.presto.udfs.scalar;
 import io.airlift.slice.Slice;
 import io.trino.spi.function.Description;
 import io.trino.spi.function.ScalarFunction;
+import io.trino.spi.function.SqlNullable;
 import io.trino.spi.function.SqlType;
 import io.trino.spi.type.StandardTypes;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
 
+import static io.airlift.slice.Slices.utf8Slice;
 import static io.trino.spi.type.DateTimeEncoding.packDateTimeWithZone;
 
 public class ExtendedDateTimeFunctions
@@ -76,5 +78,22 @@ public class ExtendedDateTimeFunctions
         long offsetTimestamp = packDateTimeWithZone(javaTimestamp.getTime(), zoneId.toString());
         return javaTimestamp.getTime() - ((PrestoDateTimeFunctions.timeZoneHourFromTimestampWithTimeZone(offsetTimestamp) * 60
                 + PrestoDateTimeFunctions.timeZoneMinuteFromTimestampWithTimeZone(offsetTimestamp)) * 60) * 1000;
+    }
+
+    @Description("Convert a timestamp string to yyyyMMdd format string")
+    @ScalarFunction(value = "to_yyyymmdd", alias = {"toyyyymmdd"})
+    @SqlType(StandardTypes.VARCHAR)
+    public
+    static @SqlNullable
+    Slice toDate8(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice inputTimestamp)
+    {
+        if (inputTimestamp == null || inputTimestamp.toStringUtf8().isEmpty()) {
+            return null;
+        }
+        String originTs = inputTimestamp.toStringUtf8();
+        if (originTs.length() < 8) {
+            return null;
+        }
+        return utf8Slice(originTs.replace("-", "").substring(0, 8));
     }
 }

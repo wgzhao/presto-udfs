@@ -16,6 +16,7 @@
 package com.wgzhao.presto.udfs;
 
 import com.google.common.collect.ImmutableSet;
+import com.wgzhao.presto.udfs.scalar.ExtendedDateTimeFunctions;
 import com.wgzhao.presto.udfs.scalar.ExtendedMathematicaFunctions;
 import com.wgzhao.presto.udfs.scalar.ExtendedNumberFunctions;
 import com.wgzhao.presto.udfs.scalar.ExtendedStringFunctions;
@@ -41,6 +42,7 @@ public class UdfPlugin
     {
         return ImmutableSet.<Class<?>>builder()
                 .add(ExtendedMathematicaFunctions.class)
+                .add(ExtendedDateTimeFunctions.class)
                 .add(ExtendedStringFunctions.class)
                 .add(FirstNonNullValueFunction.class)
                 .add(LastNonNullValueFunction.class)

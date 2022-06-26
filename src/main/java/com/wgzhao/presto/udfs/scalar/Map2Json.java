@@ -25,7 +25,7 @@ import io.trino.spi.function.SqlNullable;
 import io.trino.spi.function.SqlType;
 import io.trino.spi.type.StandardTypes;
 
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.alibaba.fastjson2.JSON.toJSONString;
 import static io.airlift.slice.Slices.utf8Slice;
 
 public class Map2Json

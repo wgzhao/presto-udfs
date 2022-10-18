@@ -47,6 +47,8 @@ unzip -q -o udfs-<version>-release.zip -d /usr/lib/trino/plugin/
 ----------------------|--------------|------------------|---------------|---------------|-----------------------------------------------------|
 | udf_add_normal_days  | varchar     | varchar, integer | scalar        | true          | add days from base date |
 | udf_add_trade_days   | varchar     | varchar, integer | scalar        | true          | add days from base date with yyyyMMdd format |
+| udf_bank_name        | varchar     | varchar          | scalar        | true          | return bank name for giving card number |
+| udf_bank_code        | varchar     | varchar          | scalar        | true          | return bank code for giving card number |
 | udf_ch2num           | bigint      | varchar          | scalar        | true          | convert chinese number to Arabia number |
 | udf_count_trade_days | integer     | varchar, varchar | scalar        | true          | count the number of trade date between given two dates |
 | udf_eval             | double      | varchar          | scalar        | true          | the implement of javascript eval function |
@@ -109,7 +111,7 @@ select udf_num2ch(); -- NULL
 
 ```sql
 select udf_ch2num('一十万三千五百四十三'); -- 103543
-select udf_ch2num('壹拾万叁仟伍佰肆拾叁'); -- 103543   
+select udf_ch2num('壹拾万叁仟伍佰肆拾叁'); -- 103543
 select udf_ch2num(''); -- NULL
 select udf_ch2num(null); -- NULL
 select udf_ch2num('abc'); -- NULL
@@ -367,6 +369,16 @@ SELECT udf_xpath_int('<a>b</a>', 'a = 10'); -- 0
 SELECT udf_xpath_int('<a><b class="odd">1</b><b class="even">2</b><b class="odd">4</b><c>8</c></a>', 'sum(a/*)'); -- 15
 ```
 
+### 银行卡相关函数
+
+主要是根据给定的银行卡，获得对应的开户行名称以及编号
+
+```sql
+select udf_bank_name('621700292010'); -- 中国建设银行
+select udf_bank_name(''); -- NULL
+select udf_bank_code('621768160266'); -- CITIC
+select udf_bank_code(''); -- NULL
+```
 ## 注意事项
 
 `src/main/resources/closedate.dat.gz` 文件存储的是从 2000 年开始到当年的所有交易日日期，每行一个日期。因此每到年底，需要将交易所下发的来年交易日追加到该文件中，并重新打包发布到生产环境。

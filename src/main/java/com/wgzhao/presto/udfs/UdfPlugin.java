@@ -16,6 +16,7 @@
 package com.wgzhao.presto.udfs;
 
 import com.google.common.collect.ImmutableSet;
+import com.wgzhao.presto.udfs.scalar.BankFunction;
 import com.wgzhao.presto.udfs.scalar.ExtendedDateTimeFunctions;
 import com.wgzhao.presto.udfs.scalar.ExtendedMathematicaFunctions;
 import com.wgzhao.presto.udfs.scalar.ExtendedNumberFunctions;
@@ -55,6 +56,7 @@ public class UdfPlugin
                 .add(IPFunction.class)
                 .add(IdCardFunctions.class)
                 .add(XmlFunctions.class)
+                .add(BankFunction.class)
                 .build();
     }
 }

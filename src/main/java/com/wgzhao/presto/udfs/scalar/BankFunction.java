@@ -70,7 +70,7 @@ public class BankFunction
     }
 
     @Description("get bank code from card number")
-    @ScalarFunction("udf_bank_name")
+    @ScalarFunction("udf_bank_code")
     @SqlType(StandardTypes.VARCHAR)
     public static @SqlNullable
     Slice getBankCode(@SqlNullable @SqlType(StandardTypes.VARCHAR) Slice cardNo)

@@ -27,6 +27,7 @@ import com.wgzhao.presto.udfs.scalar.IdCardFunctions;
 import com.wgzhao.presto.udfs.scalar.List2Json;
 import com.wgzhao.presto.udfs.scalar.Map2Json;
 import com.wgzhao.presto.udfs.scalar.Mobile2Region;
+import com.wgzhao.presto.udfs.scalar.PinyinFunction;
 import com.wgzhao.presto.udfs.scalar.TradeDateFunctions;
 import com.wgzhao.presto.udfs.scalar.XmlFunctions;
 import com.wgzhao.presto.udfs.window.FirstNonNullValueFunction;
@@ -57,6 +58,7 @@ public class UdfPlugin
                 .add(IdCardFunctions.class)
                 .add(XmlFunctions.class)
                 .add(BankFunction.class)
+                .add(PinyinFunction.class)
                 .build();
     }
 }

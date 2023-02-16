@@ -69,6 +69,7 @@ unzip -q -o udfs-<version>-release.zip -d /usr/lib/trino/plugin/
 | udf_pmod             | double      | double, double   | scalar        | true          | Returns the positive value of a mod b |
 | udf_to_chinese       | varchar     | varchar          | scalar        | true          | convert number string to chinese number string |
 | udf_to_chinese       | varchar     | varchar, boolean | scalar        | true          | convert number string to chinese number string |
+| udf_pinyin           | varchar     | varchar          | scalar        | true          | convert chinese to pinyin                      |
 | udf_xpath            | array(varchar(x)) | varchar(x), varchar(y) | scalar        | true          | Returns a string array of values within xml nodes that match the xpath
 | udf_xpath_boolean    | boolean           | varchar(x), varchar(y) | scalar        | true          | Evaluates a boolean xpath expression
 | udf_xpath_double     | double            | varchar(x), varchar(y) | scalar        | true          | Returns a double value that matches the xpath expression
@@ -379,6 +380,18 @@ select udf_bank_name(''); -- NULL
 select udf_bank_code('621768160266'); -- CITIC
 select udf_bank_code(''); -- NULL
 ```
+
+### 拼音函数
+
+把中文转换为拼音小写字母，多音字只返回常用的拼音
+
+```sql
+select udf_pinyin('中文'); -- zhongwen
+select udf_pinyin('中'); -- zhong
+select udf_pinyin(''); -- ''
+select udf_pinyin(); -- exception occurred
+```
+
 ## 注意事项
 
 `src/main/resources/closedate.dat.gz` 文件存储的是从 2000 年开始到当年的所有交易日日期，每行一个日期。因此每到年底，需要将交易所下发的来年交易日追加到该文件中，并重新打包发布到生产环境。

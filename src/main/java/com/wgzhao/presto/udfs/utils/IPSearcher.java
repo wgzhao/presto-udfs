@@ -10,38 +10,32 @@ import java.util.Objects;
 
 public class IPSearcher
 {
-    private static final Object mutex = new Object();
-    private static volatile IPSearcher instance;
-    private final DbSearcher dbSearcher;
+    private static final String FILE_NAME = "/ip2region.db";
 
-    private IPSearcher(String filepath)
-            throws DbMakerConfigException, IOException
+    private static final class IPSearcherHolder
     {
-        DbConfig config = new DbConfig();
-        byte[] dbData = Objects.requireNonNull(IPSearcher.class.getResourceAsStream(filepath)).readAllBytes();
-        this.dbSearcher = new DbSearcher(config, dbData);
-        // load into memory when first query
-        this.dbSearcher.memorySearch("127.0.0.1");
+        private static final IPSearcher instance = new IPSearcher();
     }
 
-    public static IPSearcher getInstance(String filepath)
+    private final DbSearcher dbSearcher;
+
+    private IPSearcher()
     {
         try {
-            IPSearcher result = instance;
-            if (result == null) {
-                synchronized (mutex) {
-                    result = instance;
-                    if (result == null) {
-                        instance = result = new IPSearcher(filepath);
-                    }
-                }
-                return result;
-            }
-            return instance;
+            DbConfig config = new DbConfig();
+            byte[] dbData = Objects.requireNonNull(IPSearcher.class.getResourceAsStream(FILE_NAME)).readAllBytes();
+            this.dbSearcher = new DbSearcher(config, dbData);
+            // load into memory when first query
+            this.dbSearcher.memorySearch("127.0.0.1");
         }
         catch (DbMakerConfigException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static IPSearcher getInstance()
+    {
+        return IPSearcherHolder.instance;
     }
 
     public DataBlock lookup(String ipStr)

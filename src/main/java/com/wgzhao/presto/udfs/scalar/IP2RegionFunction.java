@@ -61,7 +61,7 @@ public class IP2RegionFunction
     private static String ipSearch(String ip, String segment)
     {
         String result = null;
-        IPSearcher searcher = IPSearcher.getInstance(FILE_NAME);
+        IPSearcher searcher = IPSearcher.getInstance();
 
         DataBlock dataBlock = searcher.lookup(ip);
         Map<String, String> ipInfo = new HashMap<>();
